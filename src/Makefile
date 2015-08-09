@@ -11,8 +11,10 @@ INCLUDES+= -I$(QTINCLUDES) $(addprefix -I$(QTINCLUDES)/,$(QTMODULES))
 LDFLAGS+= -L$(QTLIBS)
 LIBS+= $(addprefix -l,$(QTMODULES))
 
-MOCHDRS:= mainwindow.h controllerwidget.h shutterwidget.h
-OBJS:= main.o mainwindow.o controllerwidget.o shutterwidget.o
+MOCHDRS:= mainwindow.h controllerwidget.h shutterwidget.h buswidget.h \
+    buslinewidget.h
+OBJS:= main.o mainwindow.o controllerwidget.o shutterwidget.o buswidget.o \
+    buslinewidget.o
 
 OBJS+= $(MOCHDRS:.h=_moc.o)
 
@@ -24,7 +26,7 @@ $(TARGET): $(OBJS)
 	$(VCCLD)
 	$(VR)$(CXX) -o$@ $(CFLAGS) $(LDFLAGS) $^ $(LIBS)
 
-%.d: %.cpp
+%.d: %.cpp Makefile
 	$(VDEP)
 	$(VR)$(CXX) -MM -MT"$@ $(@:.d=.o)" -MF$@ $(CFLAGS) $(INCLUDES) $<
 
@@ -34,11 +36,11 @@ ifneq ($(MAKECMDGOALS),distclean)
 endif
 endif
 
-%.o: %.cpp
+%.o: %.cpp Makefile
 	$(VCXX)
 	$(VR)$(CXX) -c -o$@ $(CFLAGS) $(INCLUDES) $<
 
-%_moc.cpp: %.h
+%_moc.cpp: %.h Makefile
 	$(VMOC)
 	$(VR)moc -o$@ $<
 

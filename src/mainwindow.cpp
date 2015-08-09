@@ -15,6 +15,10 @@ MainWindow::MainWindow()
    }
 
    vbox->addLayout(hbox);
+
+   bus = new BusWidget(this);
+   vbox->addWidget(bus);
+
    setLayout(vbox);
    setWindowTitle(tr("Shutter control simulation"));
 }
