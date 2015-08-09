@@ -2,7 +2,7 @@
 #include "controllerwidget.h"
 #include "shutterwidget.h"
 
-#define NUM_SHUTTERS 4
+#define NUM_SHUTTERS 6
 
 class MainWindow: public QWidget
 {

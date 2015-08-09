@@ -1,6 +1,7 @@
 *~
 *.swp
 *.o
+*.d
 *.map
 *.afx
 *_moc.cpp
