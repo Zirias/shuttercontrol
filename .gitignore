@@ -3,4 +3,5 @@
 *.o
 *.map
 *.afx
+*_moc.cpp
 
