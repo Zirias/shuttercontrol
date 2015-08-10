@@ -5,12 +5,25 @@ ControllerWidget::ControllerWidget(QWidget *parent)
 {
     QVBoxLayout *vbox = new QVBoxLayout();
 
-    up = new QPushButton(tr("up"));
-    down = new QPushButton(tr("down"));
+    upButton = new QPushButton(tr("up"));
+    downButton = new QPushButton(tr("down"));
 
-    vbox->addWidget(up);
-    vbox->addWidget(down);
+    vbox->addWidget(upButton);
+    vbox->addWidget(downButton);
 
     setLayout(vbox);
+
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+}
+
+void ControllerWidget::upClicked()
+{
+    emit up();
+}
+
+void ControllerWidget::downClicked()
+{
+    emit down();
 }
 

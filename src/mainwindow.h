@@ -1,7 +1,12 @@
+#ifndef SCTL_MAINWINDOW_H
+#define SCTL_MAINWINDOW_H
+
 #include <QtGui>
 #include "controllerwidget.h"
 #include "shutterwidget.h"
 #include "buswidget.h"
+#include "bus.h"
+#include "controller.h"
 
 #define NUM_SHUTTERS 6
 
@@ -13,8 +18,11 @@ class MainWindow: public QWidget
 	MainWindow();
 
     private:
-	ControllerWidget *controller;
-	ShutterWidget *shutter[NUM_SHUTTERS];
-	BusWidget *bus;
+	ControllerWidget *controllerwidget;
+	ShutterWidget *shutterwidgets[NUM_SHUTTERS];
+	BusWidget *buswidget;
+	Bus bus;
+	Controller controller;
 };
 
+#endif

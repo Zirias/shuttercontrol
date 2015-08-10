@@ -9,12 +9,12 @@ QTMODULES:= QtCore QtGui
 
 INCLUDES+= -I$(QTINCLUDES) $(addprefix -I$(QTINCLUDES)/,$(QTMODULES))
 LDFLAGS+= -L$(QTLIBS)
-LIBS+= $(addprefix -l,$(QTMODULES))
+LIBS+= -pthread $(addprefix -l,$(QTMODULES))
 
 MOCHDRS:= mainwindow.h controllerwidget.h shutterwidget.h buswidget.h \
-    buslinewidget.h
+    buslinewidget.h buslineid.h bus.h controller.h
 OBJS:= main.o mainwindow.o controllerwidget.o shutterwidget.o buswidget.o \
-    buslinewidget.o
+    buslinewidget.o buslineid.o bus.o controller.o
 
 OBJS+= $(MOCHDRS:.h=_moc.o)
 

@@ -5,21 +5,32 @@ MainWindow::MainWindow()
    QVBoxLayout *vbox = new QVBoxLayout();
    QHBoxLayout *hbox = new QHBoxLayout();
 
-   controller = new ControllerWidget(this);
-   hbox->addWidget(controller);
+   controllerwidget = new ControllerWidget(this);
+   hbox->addWidget(controllerwidget);
 
    for (int i = 0; i < NUM_SHUTTERS; ++i)
    {
-       shutter[i] = new ShutterWidget(i, this);
-       hbox->addWidget(shutter[i]);
+       shutterwidgets[i] = new ShutterWidget(i, this);
+       hbox->addWidget(shutterwidgets[i]);
    }
 
    vbox->addLayout(hbox);
 
-   bus = new BusWidget(this);
-   vbox->addWidget(bus);
+   buswidget = new BusWidget(this);
+   vbox->addWidget(buswidget);
 
    setLayout(vbox);
    setWindowTitle(tr("Shutter control simulation"));
+
+   connect(&bus, SIGNAL(changed(const Bus *)),
+	   buswidget, SLOT(show(const Bus *)));
+
+   connect(&controller, SIGNAL(writeBus(int)),
+	   &bus, SLOT(set(int)));
+   connect(&bus, SIGNAL(changed(const Bus *)),
+	   &controller, SLOT(readBus(const Bus *)));
+
+   connect(controllerwidget, SIGNAL(up()), &controller, SLOT(up()));
+   connect(controllerwidget, SIGNAL(down()), &controller, SLOT(down()));
 }
 

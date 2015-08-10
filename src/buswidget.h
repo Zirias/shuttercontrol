@@ -1,6 +1,10 @@
+#ifndef SCTL_BUSWIDGET_H
+#define SCRL_BUSWIDGET_H
+
 #include <QtGui>
 
 #include "buslinewidget.h"
+#include "bus.h"
 
 class BusWidget: public QWidget
 {
@@ -9,15 +13,11 @@ class BusWidget: public QWidget
     public:
 	BusWidget(QWidget *parent = 0);
 
+    public slots:
+	void show(const Bus *bus);
+
     private:
-	BusLineWidget *a0;
-	BusLineWidget *a1;
-	BusLineWidget *a2;
-	BusLineWidget *a3;
-	BusLineWidget *d0;
-	BusLineWidget *d1;
-	BusLineWidget *d2;
-	BusLineWidget *bc;
-	BusLineWidget *irq;
+	BusLineWidget *lines[9];
 };
 
+#endif

@@ -1,3 +1,6 @@
+#ifndef SCTL_SHUTTERWIDGET_H
+#define SCTL_SHUTTERWIDGET_H
+
 #include <QtGui>
 
 class ShutterWidget: public QGroupBox
@@ -12,3 +15,4 @@ class ShutterWidget: public QGroupBox
 	QPushButton *down;
 };
 
+#endif
