@@ -1,6 +1,6 @@
 #include "controllerwidget.h"
 
-ControllerWidget::ControllerWidget(QWidget *parent)
+ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     : QGroupBox(QString(tr("Controller")), parent)
 {
     QVBoxLayout *vbox = new QVBoxLayout();
@@ -10,6 +10,7 @@ ControllerWidget::ControllerWidget(QWidget *parent)
 
     vbox->addWidget(upButton);
     vbox->addWidget(downButton);
+    vbox->addWidget(connector);
 
     setLayout(vbox);
 

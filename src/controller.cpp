@@ -5,18 +5,25 @@
 #include <QTimer>
 
 Controller::Controller()
-    : QObject()
+    : BusClient()
 {
-    QThread* thread = new QThread();
-    moveToThread(thread);
-    connect(thread, SIGNAL(started()), this, SLOT(run()));
-    connect(this, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
+    connect(timer, SIGNAL(timeout()), this, SLOT(resetBus()));
 }
 
-void Controller::readBus(const Bus *bus)
+Controller::~Controller()
+{
+    timer->stop();
+    delete timer;
+}
+
+void Controller::connected()
+{
+    emit setDirections(0x1ff);
+}
+
+void Controller::readBus(int lines)
 {
 }
 
@@ -31,13 +38,6 @@ void Controller::down()
 {
     emit writeBus(Bus::IRQ | 0xf | Bus::D1);
     timer->start(500);
-}
-
-void Controller::run()
-{
-    timer = new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(resetBus()));
 }
 
 void Controller::resetBus()

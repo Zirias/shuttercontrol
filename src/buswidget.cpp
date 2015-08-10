@@ -10,7 +10,8 @@ BusWidget::BusWidget(QWidget *parent)
 
     for (int i = 0; i < 9; ++i)
     {
-	lbl = new QLabel(BusLineId::name(i), this);
+	lbl = new QLabel(
+		QString("[%1] %2").arg(i).arg(BusLineId::name(i)), this);
 	lines[i] = new BusLineWidget(this);
 	layout->addWidget(lbl, i, 0);
 	layout->addWidget(lines[i], i, 1);

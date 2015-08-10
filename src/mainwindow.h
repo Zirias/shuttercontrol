@@ -10,6 +10,8 @@
 
 #define NUM_SHUTTERS 6
 
+class Shutter;
+
 class MainWindow: public QWidget
 {
     Q_OBJECT
@@ -23,6 +25,7 @@ class MainWindow: public QWidget
 	BusWidget *buswidget;
 	Bus bus;
 	Controller controller;
+	Shutter *shutters[NUM_SHUTTERS];
 };
 
 #endif

@@ -12,12 +12,12 @@ CXXFLAGS+= -O3 -g0
 LDFLAGS+= -L$(QTLIBS) -Wl,-s
 LIBS+= -pthread $(addprefix -l,$(QTMODULES))
 
-MOCHDRS:= mainwindow.h controllerwidget.h shutterwidget.h buswidget.h \
-    buslinewidget.h buslineid.h bus.h controller.h
-OBJS:= main.o mainwindow.o controllerwidget.o shutterwidget.o buswidget.o \
-    buslinewidget.o buslineid.o bus.o controller.o
+OBJS:= main.o
+MOCOBJS:= mainwindow.o controllerwidget.o shutterwidget.o buswidget.o \
+    buslinewidget.o buslineid.o bus.o busconnector.o busclient.o controller.o \
+    busconnectorwidget.o shutter.o
 
-OBJS+= $(MOCHDRS:.h=_moc.o)
+OBJS+= $(MOCOBJS) $(MOCOBJS:.o=_moc.o)
 
 include ../mk/silent.mk
 
@@ -46,7 +46,7 @@ endif
 	$(VR)moc -o$@ $<
 
 clean:
-	rm -f $(OBJS) $(OBJS:.o=.d) $(MOCHDRS:.h=_moc.cpp)
+	rm -f $(OBJS) $(OBJS:.o=.d)
 
 distclean: clean
 	rm -f $(TARGET)

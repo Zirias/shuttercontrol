@@ -6,6 +6,8 @@
 
 #include "buslineid.h"
 
+class BusConnector;
+
 class Bus: public QObject
 {
     Q_OBJECT
@@ -31,14 +33,10 @@ class Bus: public QObject
 	bool isLineSet(BusLineId::ID id) const;
 	bool isLineSet(int id) const;
 	operator Lines() const;
+	BusConnector *connector();
 
     public slots:
-	void set(Lines lines);
 	void set(int lines);
-	void setLine(BusLineId::ID id);
-	void setLine(int id);
-	void clearLine(BusLineId::ID id);
-	void clearLine(int id);
 
     signals:
 	void changed(const Bus *bus);

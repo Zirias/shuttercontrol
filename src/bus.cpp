@@ -1,40 +1,15 @@
 #include "bus.h"
 
+#include "busconnector.h"
+
 Bus::Bus(int lines)
     : QObject(), lines(lines)
 {}
 
-void Bus::set(Bus::Lines lines)
-{
-    this->lines = lines;
-    emit changed(this);
-}
-
 void Bus::set(int lines)
 {
-    set((Bus::Lines) lines);
-}
-
-void Bus::setLine(BusLineId::ID id)
-{
-    lines |= Line(1 << id);
+    this->lines = (Bus::Lines)lines;
     emit changed(this);
-}
-
-void Bus::setLine(int id)
-{
-    setLine((BusLineId::ID) id);
-}
-
-void Bus::clearLine(BusLineId::ID id)
-{
-    lines &= ~(Line(1 << id));
-    emit changed(this);
-}
-
-void Bus::clearLine(int id)
-{
-    clearLine((BusLineId::ID) id);
 }
 
 bool Bus::isLineSet(BusLineId::ID id) const
@@ -50,4 +25,17 @@ bool Bus::isLineSet(int id) const
 Bus::operator Bus::Lines() const
 {
     return lines;
+}
+
+BusConnector *Bus::connector()
+{
+    BusConnector *conn = new BusConnector();
+    conn->readBus(this);
+
+    connect(this, SIGNAL(changed(const Bus *)),
+	    conn, SLOT(readBus(const Bus *)));
+    connect(conn, SIGNAL(writeBus(int)),
+	    this, SLOT(set(int)));
+
+    return conn;
 }

@@ -8,7 +8,7 @@ class ControllerWidget: public QGroupBox
     Q_OBJECT
 
     public:
-	ControllerWidget(QWidget *parent = 0);
+	ControllerWidget(QWidget *connector, QWidget *parent = 0);
 
     private slots:
 	void upClicked();

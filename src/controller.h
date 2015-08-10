@@ -1,31 +1,30 @@
 #ifndef SCTL_CONTROLLER_H
 #define SCTL_CONTROLLER_H
 
-#include <QObject>
+#include "busclient.h"
 
 class Bus;
 class QTimer;
 
-class Controller: public QObject
+class Controller: public BusClient
 {
     Q_OBJECT
 
     public:
 	Controller();
+	virtual ~Controller();
 
     public slots:
-	void readBus(const Bus *bus);
+	virtual void readBus(int lines);
 	void up();
 	void down();
 
     private slots:
-	void run();
 	void resetBus();
 
-    signals:
-	void writeBus(int value);
-	void finished();
-
+    protected:
+	virtual void connected();
+	
     private:
 	QTimer *timer;
 };
