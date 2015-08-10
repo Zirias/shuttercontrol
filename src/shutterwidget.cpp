@@ -8,6 +8,8 @@ ShutterWidget::ShutterWidget(int i, QWidget *controller, QWidget *parent)
     up = new QPushButton(tr("up"));
     down = new QPushButton(tr("down"));
 
+    vbox->addItem(new QSpacerItem(0, 0,
+		QSizePolicy::Minimum, QSizePolicy::Expanding));
     vbox->addWidget(up);
     vbox->addWidget(down);
     vbox->addWidget(controller);

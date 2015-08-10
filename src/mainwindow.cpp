@@ -3,6 +3,8 @@
 #include "busconnector.h"
 #include "shutter.h"
 
+class BusClock;
+
 MainWindow::MainWindow()
 {
    QVBoxLayout *vbox = new QVBoxLayout();
@@ -42,5 +44,7 @@ MainWindow::MainWindow()
 
    connect(controllerwidget, SIGNAL(up()), &controller, SLOT(up()));
    connect(controllerwidget, SIGNAL(down()), &controller, SLOT(down()));
+   connect(controllerwidget, SIGNAL(selectClock(const BusClock *)),
+	   &controller, SLOT(setClock(const BusClock *)));
 }
 

@@ -12,7 +12,7 @@ CXXFLAGS+= -O3 -g0
 LDFLAGS+= -L$(QTLIBS) -Wl,-s
 LIBS+= -pthread $(addprefix -l,$(QTMODULES))
 
-OBJS:= main.o
+OBJS:= main.o busclock.o
 MOCOBJS:= mainwindow.o controllerwidget.o shutterwidget.o buswidget.o \
     buslinewidget.o buslineid.o bus.o busconnector.o busclient.o controller.o \
     busconnectorwidget.o shutter.o

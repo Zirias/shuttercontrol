@@ -4,6 +4,7 @@
 #include "busclient.h"
 
 class Bus;
+class BusClock;
 class QTimer;
 
 class Controller: public BusClient
@@ -18,6 +19,7 @@ class Controller: public BusClient
 	virtual void readBus(int lines);
 	void up();
 	void down();
+	void setClock(const BusClock *clock);
 
     private slots:
 	void resetBus();
@@ -27,6 +29,7 @@ class Controller: public BusClient
 	
     private:
 	QTimer *timer;
+	const BusClock *clock;
 };
 
 #endif

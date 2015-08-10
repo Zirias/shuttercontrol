@@ -1,11 +1,12 @@
 #include "controller.h"
 
 #include "bus.h"
+#include "busclock.h"
 #include <QThread>
 #include <QTimer>
 
 Controller::Controller()
-    : BusClient()
+    : BusClient(), clock(&BusClock::byId(BusClock::defClock))
 {
     timer = new QTimer(this);
     timer->setSingleShot(true);
@@ -30,14 +31,18 @@ void Controller::readBus(int lines)
 void Controller::up()
 {
     emit writeBus(Bus::IRQ | 0xf | Bus::D0);
-    timer->setSingleShot(500);
-    timer->start(500);
+    timer->start(clock->period());
 }
 
 void Controller::down()
 {
     emit writeBus(Bus::IRQ | 0xf | Bus::D1);
-    timer->start(500);
+    timer->start(clock->period());
+}
+
+void Controller::setClock(const BusClock *clock)
+{
+    this->clock = clock;
 }
 
 void Controller::resetBus()
