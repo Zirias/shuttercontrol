@@ -16,7 +16,7 @@ MainWindow::MainWindow()
    {
        shutters[i] = new Shutter(i+1);
        BusConnectorWidget *cw = new BusConnectorWidget(this);
-       shutterwidgets[i] = new ShutterWidget(i, cw, this);
+       shutterwidgets[i] = new ShutterWidget(i+1, cw, this);
        hbox->addWidget(shutterwidgets[i]);
        shutters[i]->connectBus(&bus);
        BusConnector *c = shutters[i]->connector();

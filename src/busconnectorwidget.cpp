@@ -32,7 +32,7 @@ class BusConnectorPinWidget: public QWidget
 };
 
 BusConnectorWidget::BusConnectorWidget(QWidget *parent)
-    : QWidget(parent)
+    : QGroupBox("Bus Connector", parent)
 {
     QGridLayout *layout = new QGridLayout();
     QLabel *lbl;
@@ -40,6 +40,7 @@ BusConnectorWidget::BusConnectorWidget(QWidget *parent)
     for (int i = 0; i < 9; ++i)
     {
 	lbl = new QLabel(QString::number(i), this);
+	lbl->setAlignment(Qt::AlignHCenter);
 	pins[i] = new BusConnectorPinWidget(this);
 	layout->addWidget(lbl, 0, i);
 	layout->addWidget(pins[i], 1, i);

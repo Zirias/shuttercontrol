@@ -8,7 +8,7 @@
 #include "bus.h"
 #include "controller.h"
 
-#define NUM_SHUTTERS 6
+#define NUM_SHUTTERS 4
 
 class Shutter;
 

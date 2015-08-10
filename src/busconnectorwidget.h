@@ -5,7 +5,7 @@
 
 class BusConnectorPinWidget;
 
-class BusConnectorWidget: public QWidget
+class BusConnectorWidget: public QGroupBox
 {
     Q_OBJECT
 
