@@ -1,6 +1,6 @@
 CXX:= g++
 
-TARGET:= shuttercontrol
+TARGET:= ../shuttercontrol
 
 QTLIBS:= /usr/lib/x86_64-linux-gnu
 QTINCLUDES:= /usr/include/qt4
@@ -8,7 +8,8 @@ QTINCLUDES:= /usr/include/qt4
 QTMODULES:= QtCore QtGui
 
 INCLUDES+= -I$(QTINCLUDES) $(addprefix -I$(QTINCLUDES)/,$(QTMODULES))
-LDFLAGS+= -L$(QTLIBS)
+CXXFLAGS+= -O3 -g0
+LDFLAGS+= -L$(QTLIBS) -Wl,-s
 LIBS+= -pthread $(addprefix -l,$(QTMODULES))
 
 MOCHDRS:= mainwindow.h controllerwidget.h shutterwidget.h buswidget.h \
@@ -24,11 +25,11 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(VCCLD)
-	$(VR)$(CXX) -o$@ $(CFLAGS) $(LDFLAGS) $^ $(LIBS)
+	$(VR)$(CXX) -o$@ $(CXXFLAGS) $(LDFLAGS) $^ $(LIBS)
 
 %.d: %.cpp Makefile
 	$(VDEP)
-	$(VR)$(CXX) -MM -MT"$@ $(@:.d=.o)" -MF$@ $(CFLAGS) $(INCLUDES) $<
+	$(VR)$(CXX) -MM -MT"$@ $(@:.d=.o)" -MF$@ $(CXXFLAGS) $(INCLUDES) $<
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
@@ -38,7 +39,7 @@ endif
 
 %.o: %.cpp Makefile
 	$(VCXX)
-	$(VR)$(CXX) -c -o$@ $(CFLAGS) $(INCLUDES) $<
+	$(VR)$(CXX) -c -o$@ $(CXXFLAGS) $(INCLUDES) $<
 
 %_moc.cpp: %.h Makefile
 	$(VMOC)
