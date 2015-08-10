@@ -2,7 +2,6 @@
 
 #include "bus.h"
 #include "busclock.h"
-#include <QThread>
 #include <QTimer>
 
 Controller::Controller()
