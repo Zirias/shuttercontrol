@@ -1,7 +1,7 @@
 #ifndef SCTL_BUSCONNECTORWIDGET_H
 #define SCTL_BUSCONNECTORWIDGET_H
 
-#include <QtGui>
+#include <QGroupBox>
 
 class BusConnectorPinWidget;
 

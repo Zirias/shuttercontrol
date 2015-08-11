@@ -20,16 +20,22 @@ class Controller: public BusClient
 	void up();
 	void down();
 	void setClock(const BusClock *clock);
+	void setAddr(int addr);
 
     private slots:
-	void resetBus();
+	void step();
+
+    private:
+	void startAction(int action);
 
     protected:
 	virtual void connected();
 	
     private:
 	QTimer *timer;
+	bool active;
 	const BusClock *clock;
+	int addr, addrSet;
 };
 
 #endif

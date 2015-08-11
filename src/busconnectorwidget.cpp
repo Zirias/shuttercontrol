@@ -1,5 +1,9 @@
 #include "busconnectorwidget.h"
 
+#include <QGridLayout>
+#include <QLabel>
+#include <QPainter>
+
 class BusConnectorPinWidget: public QWidget
 {
     private:

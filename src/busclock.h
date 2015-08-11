@@ -1,8 +1,6 @@
 #ifndef SCTL_BUSCLOCK_H
 #define SCTL_BUSCLOCK_H
 
-#include <QtCore>
-
 class BusClock
 {
     private:

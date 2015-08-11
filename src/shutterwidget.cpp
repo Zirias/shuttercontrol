@@ -1,5 +1,9 @@
 #include "shutterwidget.h"
 
+#include <QVBoxLayout>
+#include <QSpacerItem>
+#include <QPushButton>
+
 ShutterWidget::ShutterWidget(int i, QWidget *controller, QWidget *parent)
     : QGroupBox(QString(tr("Shutter %1")).arg(i), parent)
 {

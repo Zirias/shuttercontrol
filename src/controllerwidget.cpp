@@ -1,5 +1,23 @@
 #include "controllerwidget.h"
+
 #include "busclock.h"
+
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QSpacerItem>
+#include <QComboBox>
+#include <QLabel>
+#include <QPushButton>
+
+static QString addrlabel(const QString &a, int addr)
+{
+    switch (addr)
+    {
+	case 0x0: return a.arg(ControllerWidget::tr("NA"));
+	case 0xf: return a.arg(ControllerWidget::tr("BC"));
+	default: return a.arg(addr,2,10,QChar('0'));
+    }
+}
 
 ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     : QGroupBox(QString(tr("Controller")), parent)
@@ -7,8 +25,9 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     QVBoxLayout *vbox = new QVBoxLayout();
     QHBoxLayout *hbox = new QHBoxLayout();
 
-    upButton = new QPushButton(tr("up"), this);
-    downButton = new QPushButton(tr("down"), this);
+    vbox->addItem(new QSpacerItem(0, 0,
+		QSizePolicy::Minimum, QSizePolicy::Expanding));
+
     clockSelect = new QComboBox(this);
 
     for (int i = 0; i < BusClock::nClocks; ++i)
@@ -20,9 +39,24 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     hbox->addWidget(new QLabel(tr("clock:"), this));
     hbox->addWidget(clockSelect);
 
-    vbox->addItem(new QSpacerItem(0, 0,
-		QSizePolicy::Minimum, QSizePolicy::Expanding));
     vbox->addLayout(hbox);
+
+    hbox = new QHBoxLayout();
+    addrSelect = new QComboBox(this);
+    for (int i = 0x0; i < 0x10; ++i)
+    {
+	addrSelect->addItem(addrlabel(QString("0x%1: [%2]").arg(i,0,16), i));
+    }
+    addrSelect->setCurrentIndex(0xf);
+
+    hbox->addWidget(new QLabel(tr("addr:"), this));
+    hbox->addWidget(addrSelect);
+
+    vbox->addLayout(hbox);
+
+    upButton = new QPushButton(tr("up"), this);
+    downButton = new QPushButton(tr("down"), this);
+
     vbox->addWidget(upButton);
     vbox->addWidget(downButton);
     vbox->addWidget(connector);

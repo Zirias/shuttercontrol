@@ -1,10 +1,10 @@
 #ifndef SCTL_BUSWIDGET_H
 #define SCRL_BUSWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
 
-#include "buslinewidget.h"
-#include "bus.h"
+class Bus;
+class BusLineWidget;
 
 class BusWidget: public QWidget
 {

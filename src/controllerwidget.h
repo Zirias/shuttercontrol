@@ -1,9 +1,11 @@
 #ifndef SCTL_CONTROLLERWIDGET_H
 #define SCTL_CONTRLLLERWIDGET_H
 
-#include <QtGui>
+#include <QGroupBox>
 
 class BusClock;
+class QPushButton;
+class QComboBox;
 
 class ControllerWidget: public QGroupBox
 {
@@ -26,6 +28,7 @@ class ControllerWidget: public QGroupBox
 	QPushButton *upButton;
 	QPushButton *downButton;
 	QComboBox *clockSelect;
+	QComboBox *addrSelect;
 };
 
 #endif

@@ -1,7 +1,14 @@
 #include "mainwindow.h"
-#include "busconnectorwidget.h"
+
 #include "busconnector.h"
 #include "shutter.h"
+#include "controllerwidget.h"
+#include "shutterwidget.h"
+#include "busconnectorwidget.h"
+#include "buswidget.h"
+
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 class BusClock;
 

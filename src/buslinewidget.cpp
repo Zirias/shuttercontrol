@@ -1,5 +1,7 @@
 #include "buslinewidget.h"
 
+#include <QPainter>
+
 BusLineWidget::BusLineWidget(QWidget *parent)
     : QWidget(parent), isSet(false)
 {}

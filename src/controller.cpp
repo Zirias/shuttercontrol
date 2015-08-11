@@ -9,7 +9,7 @@ Controller::Controller()
 {
     timer = new QTimer(this);
     timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(resetBus()));
+    connect(timer, SIGNAL(timeout()), this, SLOT(step()));
 }
 
 Controller::~Controller()
@@ -20,7 +20,7 @@ Controller::~Controller()
 
 void Controller::connected()
 {
-    emit setDirections(0x1ff);
+    emit setDirections(0x18f);
 }
 
 void Controller::readBus(int lines)
@@ -44,7 +44,17 @@ void Controller::setClock(const BusClock *clock)
     this->clock = clock;
 }
 
-void Controller::resetBus()
+void Controller::step()
 {
     emit writeBus(0);
 }
+
+void Controller::startAction(int action)
+{
+}
+
+void Controller::setAddr(int addr)
+{
+    addrSet = addr;
+}
+

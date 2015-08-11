@@ -1,6 +1,11 @@
 #include "buswidget.h"
 
+#include "bus.h"
 #include "buslineid.h"
+#include "buslinewidget.h"
+
+#include <QGridLayout>
+#include <QLabel>
 
 BusWidget::BusWidget(QWidget *parent)
     : QWidget(parent)

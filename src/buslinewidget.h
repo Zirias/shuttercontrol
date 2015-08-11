@@ -1,7 +1,7 @@
 #ifndef SCTL_BUSLINEWIDGET_H
 #define SCTL_BUSLINEWIDGET_H
 
-#include <QtGui>
+#include <QWidget>
 
 class BusLineWidget: public QWidget
 {
