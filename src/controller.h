@@ -38,6 +38,7 @@ class Controller: public BusClient
 	QQueue<ControllerAction *> pending;
 	const BusClock *clock;
 	int addr;
+	enum { dnone, dup, ddown } lastDir[0x10];
 };
 
 #endif
