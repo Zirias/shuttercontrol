@@ -2,10 +2,12 @@
 #define SCTL_CONTROLLER_H
 
 #include "busclient.h"
+#include <QQueue>
 
 class Bus;
 class BusClock;
 class QTimer;
+class ControllerAction;
 
 class Controller: public BusClient
 {
@@ -22,20 +24,20 @@ class Controller: public BusClient
 	void setClock(const BusClock *clock);
 	void setAddr(int addr);
 
+    protected:
+	virtual void connected();
+	
     private slots:
 	void step();
 
     private:
-	void startAction(int action);
+	void startAction(ControllerAction *act);
 
-    protected:
-	virtual void connected();
-	
-    private:
 	QTimer *timer;
-	bool active;
+	ControllerAction *action;
+	QQueue<ControllerAction *> pending;
 	const BusClock *clock;
-	int addr, addrSet;
+	int addr;
 };
 
 #endif

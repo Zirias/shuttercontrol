@@ -67,6 +67,8 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(clockSelect, SIGNAL(currentIndexChanged(int)),
 	    this, SLOT(clockSelected(int)));
+    connect(addrSelect, SIGNAL(currentIndexChanged(int)),
+	    this, SLOT(addrSelected(int)));
 }
 
 void ControllerWidget::upClicked()
@@ -82,4 +84,9 @@ void ControllerWidget::downClicked()
 void ControllerWidget::clockSelected(int index)
 {
     emit selectClock(&BusClock::byId(index));
+}
+
+void ControllerWidget::addrSelected(int index)
+{
+    emit selectAddr(index);
 }

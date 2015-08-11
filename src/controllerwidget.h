@@ -18,11 +18,13 @@ class ControllerWidget: public QGroupBox
 	void upClicked();
 	void downClicked();
 	void clockSelected(int index);
+	void addrSelected(int index);
 
     signals:
 	void up();
 	void down();
 	void selectClock(const BusClock *clock);
+	void selectAddr(int addr);
 
     private:
 	QPushButton *upButton;

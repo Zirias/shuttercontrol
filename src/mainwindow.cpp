@@ -53,5 +53,7 @@ MainWindow::MainWindow()
    connect(controllerwidget, SIGNAL(down()), &controller, SLOT(down()));
    connect(controllerwidget, SIGNAL(selectClock(const BusClock *)),
 	   &controller, SLOT(setClock(const BusClock *)));
+   connect(controllerwidget, SIGNAL(selectAddr(int)),
+	   &controller, SLOT(setAddr(int)));
 }
 

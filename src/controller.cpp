@@ -2,13 +2,15 @@
 
 #include "bus.h"
 #include "busclock.h"
+#include "controlleraction.h"
 #include <QTimer>
 
 Controller::Controller()
-    : BusClient(), clock(&BusClock::byId(BusClock::defClock))
+    : BusClient(), clock(&BusClock::byId(BusClock::defClock)),
+    addr(0xf), action(0)
 {
     timer = new QTimer(this);
-    timer->setSingleShot(true);
+    timer->setInterval(clock->period());
     connect(timer, SIGNAL(timeout()), this, SLOT(step()));
 }
 
@@ -29,32 +31,76 @@ void Controller::readBus(int lines)
 
 void Controller::up()
 {
-    emit writeBus(Bus::IRQ | 0xf | Bus::D0);
-    timer->start(clock->period());
+    startAction(new ControllerAction(ControllerAction::Up, addr));
 }
 
 void Controller::down()
 {
-    emit writeBus(Bus::IRQ | 0xf | Bus::D1);
-    timer->start(clock->period());
+    startAction(new ControllerAction(ControllerAction::Down, addr));
 }
 
 void Controller::setClock(const BusClock *clock)
 {
     this->clock = clock;
+    timer->setInterval(clock->period());
 }
 
 void Controller::step()
 {
-    emit writeBus(0);
+    if (!action)
+    {
+	if (!pending.isEmpty()) action = pending.dequeue();
+	else
+	{
+	    timer->stop();
+	    return;
+	}
+    }
+    bool running = true;
+    while (running)
+    {
+	const ControllerAction::Step &step = action->nextStep();
+	switch (step.type())
+	{
+	    case ControllerAction::Step::Direction:
+		emit setDirections(step.value());
+		break;
+
+	    case ControllerAction::Step::Write:
+		emit writeBus(step.value());
+		break;
+
+	    case ControllerAction::Step::Read:
+		break;
+
+	    case ControllerAction::Step::WaitClock:
+		running = false;
+		break;
+
+	    case ControllerAction::Step::Done:
+		running = false;
+		delete action;
+		action = 0;
+	}
+    }
 }
 
-void Controller::startAction(int action)
+void Controller::startAction(ControllerAction *act)
 {
+    if (!action)
+    {
+	action = act;
+	timer->start();
+	step();
+    }
+    else
+    {
+	pending.enqueue(act);
+    }
 }
 
 void Controller::setAddr(int addr)
 {
-    addrSet = addr;
+    this->addr = addr;
 }
 
