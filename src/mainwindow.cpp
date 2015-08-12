@@ -31,14 +31,19 @@ MainWindow::MainWindow()
        BusConnector *c = shutters[i]->connector();
        connect(c, SIGNAL(changed(int)), cw, SLOT(show(int)));
        cw->show(c->getDirections());
-       connect(shutters[i], SIGNAL(stateChanged(const char *)),
-	       shutterwidgets[i], SLOT(stateChanged(const char *)));
+       connect(shutters[i], SIGNAL(stateChanged(int)),
+	       shutterwidgets[i], SLOT(stateChanged(int)));
+       connect(shutters[i], SIGNAL(up(bool)),
+	       shutterwidgets[i], SLOT(up(bool)));
+       connect(shutters[i], SIGNAL(down(bool)),
+	       shutterwidgets[i], SLOT(down(bool)));
        connect(shutterwidgets[i], SIGNAL(p_up()), shutters[i], SLOT(p_up()));
        connect(shutterwidgets[i], SIGNAL(r_up()), shutters[i], SLOT(r_up()));
        connect(shutterwidgets[i], SIGNAL(p_down()),
 	       shutters[i], SLOT(p_down()));
        connect(shutterwidgets[i], SIGNAL(r_down()),
 	       shutters[i], SLOT(r_down()));
+       shutters[i]->startChip();
    }
 
    vbox->addLayout(hbox);

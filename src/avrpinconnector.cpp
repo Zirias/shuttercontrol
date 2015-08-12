@@ -164,28 +164,28 @@ void AvrPinConnector::handleIrq(avr_irq_t *irq, uint32_t value)
     switch (irq->irq)
     {
 	case AvrPinConnector::PORTA_OUT:
-	    l = port0tobus(lines, irq->value);
+	    l = port0tobus(lines, value);
 	    if (l != lines)
 	    {
 		lines = l;
 		emit writeBus(lines);
 	    }
-	    if (_up && !(irq->value & 0x40))
+	    if (_up && !(value & 0x40))
 	    {
 		_up = false;
 		emit up(_up);
 	    }
-	    else if (!_up && (irq->value & 0x40))
+	    else if (!_up && (value & 0x40))
 	    {
 		_up = true;
 		emit up(_up);
 	    }
-	    if (_down && !(irq->value & 0x80))
+	    if (_down && !(value & 0x80))
 	    {
 		_down = false;
 		emit down(_down);
 	    }
-	    else if (!_down && (irq->value & 0x80))
+	    else if (!_down && (value & 0x80))
 	    {
 		_down = true;
 		emit down(_down);
@@ -193,7 +193,7 @@ void AvrPinConnector::handleIrq(avr_irq_t *irq, uint32_t value)
 	    break;
 
 	case AvrPinConnector::PORTB_OUT:
-	    l = port1tobus(lines, irq->value);
+	    l = port1tobus(lines, value);
 	    if (l != lines)
 	    {
 		lines = l;
@@ -202,7 +202,7 @@ void AvrPinConnector::handleIrq(avr_irq_t *irq, uint32_t value)
 	    break;
 	
 	case AvrPinConnector::DDRA:
-	    l = port0tobus(direction, irq->value);
+	    l = port0tobus(direction, value);
 	    if (l != direction)
 	    {
 		direction = l;
@@ -211,7 +211,7 @@ void AvrPinConnector::handleIrq(avr_irq_t *irq, uint32_t value)
 	    break;
 
 	case AvrPinConnector::DDRB:
-	    l = port1tobus(direction, irq->value);
+	    l = port1tobus(direction, value);
 	    if (l != direction)
 	    {
 		direction = l;

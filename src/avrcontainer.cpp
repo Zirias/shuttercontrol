@@ -14,7 +14,7 @@ AvrPinConnector *AvrContainer::getConnector()
     return cn;
 }
 
-void AvrContainer::run()
+void AvrContainer::init()
 {
     elf_firmware_t *fw = new elf_firmware_t;
     elf_read_firmware("shutterctl_attiny84/shutterctl.afx", fw);
@@ -32,10 +32,14 @@ void AvrContainer::run()
 
     cn = new AvrPinConnector(avr);
 
-    emit started();
+    emit initialized();
+}
+
+void AvrContainer::run()
+{
     int oldstate = avr->state;
     int state = oldstate;
-    emit stateChanged(stateName(state));
+    emit stateChanged(state);
 
     while (state != cpu_Done && state != cpu_Crashed)
     {
@@ -43,7 +47,7 @@ void AvrContainer::run()
 	state = avr_run(avr);
 	if (state != oldstate)
 	{
-	    emit stateChanged(stateName(state));
+	    emit stateChanged(state);
 	    oldstate = state;
 	}
     }
@@ -55,20 +59,5 @@ void AvrContainer::stop()
 {
     emit finished();
     delete cn;
-}
-
-const char *AvrContainer::stateName(int state)
-{
-    switch (state)
-    {
-	case cpu_Limbo: return "limbo";
-	case cpu_Stopped: return "stopped";
-	case cpu_Running: return "running";
-	case cpu_Sleeping: return "sleeping";
-	case cpu_Step: return "step";
-	case cpu_StepDone: return "step done";
-	case cpu_Done: return "done";
-	case cpu_Crashed: return "crashed";
-    }
 }
 

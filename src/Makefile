@@ -45,7 +45,8 @@ endif
 OBJS:= main.o busclock.o controlleraction.o
 MOCOBJS:= mainwindow.o controllerwidget.o shutterwidget.o buswidget.o \
     buslinewidget.o buslineid.o bus.o busconnector.o busclient.o controller.o \
-    busconnectorwidget.o shutter.o avrcontainer.o avrpinconnector.o
+    busconnectorwidget.o shutter.o avrcontainer.o avrpinconnector.o \
+    avrwidget.o
 
 OBJS+= $(MOCOBJS)
 ALLOBJS:= $(OBJS) $(MOCOBJS:.o=_moc.o)

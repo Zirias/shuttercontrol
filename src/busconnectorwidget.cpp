@@ -36,7 +36,7 @@ class BusConnectorPinWidget: public QWidget
 };
 
 BusConnectorWidget::BusConnectorWidget(QWidget *parent)
-    : QGroupBox("Bus Connector", parent)
+    : QGroupBox(tr("Bus Connector"), parent)
 {
     QGridLayout *layout = new QGridLayout();
     QLabel *lbl;

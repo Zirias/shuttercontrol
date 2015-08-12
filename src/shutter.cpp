@@ -4,19 +4,13 @@
 #include <QThread>
 
 Shutter::Shutter(int address)
-    : BusClient()
+    : BusClient(), chipRunning(false)
 {
     chip = new AvrContainer(address);
-    connect(chip, SIGNAL(started()), this, SLOT(avr_started()));
-    connect(chip, SIGNAL(stateChanged(const char *)),
-	    this, SLOT(proxy_stateChanged(const char*)));
-    QThread *thread = new QThread();
-    chip->moveToThread(thread);
-    connect(thread, SIGNAL(started()), chip, SLOT(run()));
-    connect(chip, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(chip, SIGNAL(finished()), chip, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
+    connect(chip, SIGNAL(initialized()), this, SLOT(avr_started()));
+    connect(this, SIGNAL(chipConnected()), chip, SLOT(run()));
+    connect(chip, SIGNAL(stateChanged(int)),
+	    this, SLOT(proxy_stateChanged(int)));
 }
 
 Shutter::~Shutter()
@@ -49,7 +43,20 @@ void Shutter::r_down()
     emit proxy_r_down();
 }
 
-void Shutter::proxy_stateChanged(const char *state)
+void Shutter::startChip()
+{
+    if (chipRunning) return;
+    QThread *thread = new QThread();
+    chip->moveToThread(thread);
+    connect(thread, SIGNAL(started()), chip, SLOT(init()));
+    connect(chip, SIGNAL(finished()), thread, SLOT(quit()));
+    connect(chip, SIGNAL(finished()), chip, SLOT(deleteLater()));
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    thread->start();
+    chipRunning = true;
+}
+
+void Shutter::proxy_stateChanged(int state)
 {
     emit stateChanged(state);
 }
@@ -87,6 +94,7 @@ void Shutter::avr_started()
 	    this, SLOT(proxy_setDirections(int)));
     connect(cn, SIGNAL(up(bool)), this, SLOT(proxy_up(bool)));
     connect(cn, SIGNAL(down(bool)), this, SLOT(proxy_down(bool)));
+    emit chipConnected();
 }
 
 void Shutter::connected()

@@ -15,17 +15,17 @@ class AvrContainer: public QObject
 	AvrPinConnector *getConnector();
 
     public slots:
+	void init();
 	void run();
 	void stop();
 
     signals:
-	void started();
+	void initialized();
 	void finished();
 	void error(const QString &message);
-	void stateChanged(const char *state);
+	void stateChanged(int state);
 
     private:
-	static const char *stateName(int state);
 	int address;
 	avr_t *avr;
 	AvrPinConnector *cn;

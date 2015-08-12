@@ -3,28 +3,28 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QPushButton>
-#include <QLabel>
+#include "avrwidget.h"
 
 ShutterWidget::ShutterWidget(int i, QWidget *controller, QWidget *parent)
     : QGroupBox(QString(tr("Shutter %1")).arg(i), parent)
 {
     QVBoxLayout *vbox = new QVBoxLayout();
 
-    state = new QLabel("limbo");
-    up = new QPushButton(tr("up"));
-    down = new QPushButton(tr("down"));
+    avr = new AvrWidget(this);
+    upBt = new QPushButton(tr("up"), this);
+    downBt = new QPushButton(tr("down"), this);
 
     vbox->addItem(new QSpacerItem(0, 0,
 		QSizePolicy::Minimum, QSizePolicy::Expanding));
-    vbox->addWidget(state);
-    vbox->addWidget(up);
-    vbox->addWidget(down);
+    vbox->addWidget(avr);
+    vbox->addWidget(upBt);
+    vbox->addWidget(downBt);
     vbox->addWidget(controller);
 
-    connect(up, SIGNAL(pressed()), this, SLOT(upPressed()));
-    connect(up, SIGNAL(released()), this, SLOT(upReleased()));
-    connect(down, SIGNAL(pressed()), this, SLOT(downPressed()));
-    connect(down, SIGNAL(released()), this, SLOT(downReleased()));
+    connect(upBt, SIGNAL(pressed()), this, SLOT(upPressed()));
+    connect(upBt, SIGNAL(released()), this, SLOT(upReleased()));
+    connect(downBt, SIGNAL(pressed()), this, SLOT(downPressed()));
+    connect(downBt, SIGNAL(released()), this, SLOT(downReleased()));
 
     setLayout(vbox);
 }
@@ -49,7 +49,17 @@ void ShutterWidget::downReleased()
     emit r_down();
 }
 
-void ShutterWidget::stateChanged(const char *state)
+void ShutterWidget::up(bool active)
 {
-    this->state->setText(state);
+    avr->up(active);
+}
+
+void ShutterWidget::down(bool active)
+{
+    avr->down(active);
+}
+
+void ShutterWidget::stateChanged(int state)
+{
+    avr->stateChanged(state);
 }

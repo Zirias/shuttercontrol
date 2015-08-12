@@ -19,9 +19,10 @@ class Shutter: public BusClient
 	void r_up();
 	void p_down();
 	void r_down();
+	void startChip();
     
     private slots:
-	void proxy_stateChanged(const char *state);
+	void proxy_stateChanged(int);
 	void proxy_writeBus(int lines);
 	void proxy_setDirections(int lines);
 	void proxy_up(bool active);
@@ -31,7 +32,8 @@ class Shutter: public BusClient
     signals:
 	void up(bool active);
 	void down(bool active);
-	void stateChanged(const char *state);
+	void stateChanged(int);
+	void chipConnected();
 	void proxy_readBus(int lines);
 	void proxy_p_up();
 	void proxy_r_up();
@@ -41,6 +43,7 @@ class Shutter: public BusClient
     protected:
 	virtual void connected();
 	AvrContainer *chip;
+	bool chipRunning;
 };
 
 #endif
