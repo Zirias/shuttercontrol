@@ -7,7 +7,7 @@ DEBUG:= 1
 
 ADDRESS?= 1
 
-CFLAGS:= -Wall -Os -gdwarf-2 -mmcu=attiny84 -DF_CPU=8000000 \
+CFLAGS:= -std=gnu99 -Wall -Os -gdwarf-2 -mmcu=attiny84 -DF_CPU=8000000 \
     -DADDRESS=$(ADDRESS) \
     -fno-inline-small-functions -ffunction-sections -fdata-sections
 LDFLAGS:= -Wl,--relax,--gc-sections \

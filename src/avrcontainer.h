@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-class QString;
+class AvrPinConnector;
 struct avr_t;
 
 class AvrContainer: public QObject
@@ -11,22 +11,23 @@ class AvrContainer: public QObject
     Q_OBJECT
 
     public:
-	AvrContainer(const QString &fwpath);
+	AvrContainer();
+	AvrPinConnector *getConnector();
 
     public slots:
 	void run();
 	void stop();
 
     signals:
+	void started();
 	void finished();
 	void error(const QString &message);
 	void stateChanged(const char *state);
 
     private:
 	static const char *stateName(int state);
-	const QString &fwpath;
 	avr_t *avr;
-	int lines;
+	AvrPinConnector *cn;
 };
 
 #endif

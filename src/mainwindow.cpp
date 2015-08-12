@@ -31,6 +31,8 @@ MainWindow::MainWindow()
        BusConnector *c = shutters[i]->connector();
        connect(c, SIGNAL(changed(int)), cw, SLOT(show(int)));
        cw->show(c->getDirections());
+       connect(shutters[i], SIGNAL(stateChanged(const char *)),
+	       shutterwidgets[i], SLOT(stateChanged(const char *)));
    }
 
    vbox->addLayout(hbox);

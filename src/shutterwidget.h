@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 class QPushButton;
+class QLabel;
 
 class ShutterWidget: public QGroupBox
 {
@@ -12,7 +13,11 @@ class ShutterWidget: public QGroupBox
     public:
 	ShutterWidget(int i, QWidget *connector, QWidget *parent = 0);
 
+    public slots:
+	void stateChanged(const char *state);
+
     private:
+	QLabel *state;
 	QPushButton *up;
 	QPushButton *down;
 };

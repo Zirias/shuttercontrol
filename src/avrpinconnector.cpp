@@ -1,20 +1,114 @@
 #include "avrpinconnector.h"
 
 #include <sim_avr.h>
+#include <avr_ioport.h>
+
+#include <QDebug>
+
+static const char *irqnames[] =
+{
+    "PORTA_OUT",
+    "PORTB_OUT",
+    "PORTA_IN0",
+    "PORTA_IN1",
+    "PORTA_IN2",
+    "PORTA_IN3",
+    "PORTA_IN4",
+    "PORTA_IN5",
+    "PORTA_IN6",
+    "PORTA_IN7",
+    "PORTB_IN0",
+    "PORTB_IN1",
+    "PORTB_IN2",
+    "PORTB_IN3",
+    "PORTB_IN4",
+    "PORTB_IN5",
+    "PORTB_IN6",
+    "PORTB_IN7",
+    "DDRA",
+    "DDRB"
+};
 
 AvrPinConnector::AvrPinConnector(avr_t *avr)
-    : avr(avr)
+    : avr(avr), lines(0xff), direction(0), _up(false), _down(false)
 {
-    irq = avr_alloc_irq(&avr->irq_pool, 0, IRQ_COUNT, 0);   
+    irq = avr_alloc_irq(&avr->irq_pool, 0, IRQ_COUNT, irqnames);   
 
-    avr_irq_register_notify(irq + AvrPinConnector::IRQ_PINS_OUT0,
+    avr_irq_register_notify(irq + AvrPinConnector::PORTA_OUT,
 	    &AvrPinConnector::handleIrqCallback, (void *)this);
-    avr_irq_register_notify(irq + AvrPinConnector::IRQ_PINS_OUT1,
+    avr_irq_register_notify(irq + AvrPinConnector::PORTB_OUT,
 	    &AvrPinConnector::handleIrqCallback, (void *)this);
-    avr_irq_register_notify(irq + AvrPinConnector::IRQ_DDR_0,
+    avr_irq_register_notify(irq + AvrPinConnector::DDRA,
 	    &AvrPinConnector::handleIrqCallback, (void *)this);
-    avr_irq_register_notify(irq + AvrPinConnector::IRQ_DDR_1,
+    avr_irq_register_notify(irq + AvrPinConnector::DDRB,
 	    &AvrPinConnector::handleIrqCallback, (void *)this);
+
+    avr_connect_irq(
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN_ALL),
+	    irq + AvrPinConnector::PORTA_OUT);
+    avr_connect_irq(
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN_ALL),
+	    irq + AvrPinConnector::PORTB_OUT);
+    avr_connect_irq(
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_DIRECTION_ALL),
+	    irq + AvrPinConnector::DDRA);
+    avr_connect_irq(
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_DIRECTION_ALL),
+	    irq + AvrPinConnector::DDRB);
+
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN0,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN0));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN1,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN1));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN2,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN2));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN3,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN3));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN4,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN4));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN5,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN5));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN6,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN6));
+    avr_connect_irq(irq + AvrPinConnector::PORTA_IN7,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('A'), IOPORT_IRQ_PIN7));
+
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN0,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN0));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN1,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN1));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN2,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN2));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN3,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN3));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN4,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN4));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN5,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN5));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN6,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN6));
+    avr_connect_irq(irq + AvrPinConnector::PORTB_IN7,
+	    avr_io_getirq(avr,
+		AVR_IOCTL_IOPORT_GETIRQ('B'), IOPORT_IRQ_PIN7));
 }
 
 static int port0tobus(int current, uint32_t port0)
@@ -31,21 +125,100 @@ static int port1tobus(int current, uint32_t port1)
     return current;
 }
 
-static uint32_t bustoport0(uint32_t current, int lines)
+void AvrPinConnector::readBus(int lines)
 {
-    current &= 0xc0;
-    current |= (lines & 0x3f);
-    return current;
+    avr_raise_irq(irq + AvrPinConnector::PORTA_IN0, !!(lines & 1<<0));
+    avr_raise_irq(irq + AvrPinConnector::PORTA_IN1, !!(lines & 1<<1));
+    avr_raise_irq(irq + AvrPinConnector::PORTA_IN2, !!(lines & 1<<2));
+    avr_raise_irq(irq + AvrPinConnector::PORTA_IN3, !!(lines & 1<<3));
+    avr_raise_irq(irq + AvrPinConnector::PORTA_IN4, !!(lines & 1<<4));
+    avr_raise_irq(irq + AvrPinConnector::PORTA_IN5, !!(lines & 1<<5));
+    avr_raise_irq(irq + AvrPinConnector::PORTB_IN2, !!(lines & 1<<6));
+
+    // TODO: reset line
 }
 
-static uint32_t bustoport1(uint32_t current, int lines)
+void AvrPinConnector::p_up()
 {
-    current &= 0x3;
-    current |= ((lines & 0xc0) >> 4);
+    avr_raise_irq(irq + AvrPinConnector::PORTB_IN0, 0);
+}
+
+void AvrPinConnector::r_up()
+{
+    avr_raise_irq(irq + AvrPinConnector::PORTB_IN0, 1);
+}
+
+void AvrPinConnector::p_down()
+{
+    avr_raise_irq(irq + AvrPinConnector::PORTB_IN1, 0);
+}
+
+void AvrPinConnector::r_down()
+{
+    avr_raise_irq(irq + AvrPinConnector::PORTB_IN1, 1);
 }
 
 void AvrPinConnector::handleIrq(avr_irq_t *irq, uint32_t value)
 {
+    int l;
+    switch (irq->irq)
+    {
+	case AvrPinConnector::PORTA_OUT:
+	    l = port0tobus(lines, irq->value);
+	    if (l != lines)
+	    {
+		lines = l;
+		emit writeBus(lines);
+	    }
+	    if (_up && !(irq->value & 0x40))
+	    {
+		_up = false;
+		emit up(_up);
+	    }
+	    else if (!_up && (irq->value & 0x40))
+	    {
+		_up = true;
+		emit up(_up);
+	    }
+	    if (_down && !(irq->value & 0x80))
+	    {
+		_down = false;
+		emit down(_down);
+	    }
+	    else if (!_down && (irq->value & 0x80))
+	    {
+		_down = true;
+		emit down(_down);
+	    }
+	    break;
+
+	case AvrPinConnector::PORTB_OUT:
+	    l = port1tobus(lines, irq->value);
+	    if (l != lines)
+	    {
+		lines = l;
+		emit writeBus(lines);
+	    }
+	    break;
+	
+	case AvrPinConnector::DDRA:
+	    l = port0tobus(direction, irq->value);
+	    if (l != direction)
+	    {
+		direction = l;
+		emit setDirections(direction);
+	    }
+	    break;
+
+	case AvrPinConnector::DDRB:
+	    l = port1tobus(direction, irq->value);
+	    if (l != direction)
+	    {
+		direction = l;
+		emit setDirections(direction);
+	    }
+	    break;
+    }
 }
 
 void AvrPinConnector::handleIrqCallback(

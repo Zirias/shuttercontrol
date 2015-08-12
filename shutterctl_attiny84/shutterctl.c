@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <avr/avr_mcu_section.h>
 
 #include "debug.h"
@@ -9,11 +10,20 @@ AVR_MCU(8000000, "attiny84");
 AVR_MCU_VOLTAGES(3300, 3300, 3300);
 AVR_MCU_SIMAVR_CONSOLE(&GPIOR0);
 
+ISR(PCINT1_vect)
+{
+    debugf("[%02x] interrupted.\r", eep_address);
+}
+
 int main (void)
 {
     eepdata_init();
-    debugf("address: %d.\r", eep_address);
-    while(1);
+    debugf("[%02x] starting.\r", eep_address);
+
+    GIMSK |= (1 << PCIE1);
+    PCMSK1 |= (1 << PCINT8) | (1 << PCINT9) | (1 << PCINT10);
+    sei();
+    while(1) __asm__("sleep");
     return 0;
 }
 

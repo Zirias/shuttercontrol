@@ -1,26 +1,23 @@
 #include "avrcontainer.h"
 
-#include <QThread>
 #include <QCoreApplication>
 #include <sim_avr.h>
 #include <sim_elf.h>
+#include "avrpinconnector.h"
 
-AvrContainer::AvrContainer(const QString &fwpath)
-    : QObject(), fwpath(fwpath)
+AvrContainer::AvrContainer()
+    : QObject()
+{}
+
+AvrPinConnector *AvrContainer::getConnector()
 {
-    QThread *thread = new QThread();
-    moveToThread(thread);
-    connect(thread, SIGNAL(started()), this, SLOT(run()));
-    connect(this, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
+    return cn;
 }
 
 void AvrContainer::run()
 {
     elf_firmware_t *fw = new elf_firmware_t;
-    elf_read_firmware(fwpath.toLocal8Bit(), fw);
+    elf_read_firmware("shutterctl_attiny84/shutterctl.afx", fw);
     avr = avr_make_mcu_by_name(fw->mmcu);
     if (!avr)
     {
@@ -32,6 +29,9 @@ void AvrContainer::run()
     avr_load_firmware(avr, fw);
     delete fw;
 
+    cn = new AvrPinConnector(avr);
+
+    emit started();
     int oldstate = avr->state;
     int state = oldstate;
     emit stateChanged(stateName(state));
@@ -53,6 +53,7 @@ void AvrContainer::run()
 void AvrContainer::stop()
 {
     emit finished();
+    delete cn;
 }
 
 const char *AvrContainer::stateName(int state)
