@@ -11,7 +11,7 @@ class AvrContainer: public QObject
     Q_OBJECT
 
     public:
-	AvrContainer();
+	AvrContainer(int address);
 	AvrPinConnector *getConnector();
 
     public slots:
@@ -26,6 +26,7 @@ class AvrContainer: public QObject
 
     private:
 	static const char *stateName(int state);
+	int address;
 	avr_t *avr;
 	AvrPinConnector *cn;
 };

@@ -5,8 +5,8 @@
 #include <sim_elf.h>
 #include "avrpinconnector.h"
 
-AvrContainer::AvrContainer()
-    : QObject()
+AvrContainer::AvrContainer(int address)
+    : QObject(), address(address)
 {}
 
 AvrPinConnector *AvrContainer::getConnector()
@@ -25,6 +25,7 @@ void AvrContainer::run()
 	emit finished();
 	return;
     }
+    fw->eeprom[0] = (fw->eeprom[0] & 0xf0) | (address & 0x0f);
     avr_init(avr);
     avr_load_firmware(avr, fw);
     delete fw;

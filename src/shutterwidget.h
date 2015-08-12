@@ -16,6 +16,18 @@ class ShutterWidget: public QGroupBox
     public slots:
 	void stateChanged(const char *state);
 
+    private slots:
+	void upPressed();
+	void upReleased();
+	void downPressed();
+	void downReleased();
+
+    signals:
+	void p_up();
+	void r_up();
+	void p_down();
+	void r_down();
+
     private:
 	QLabel *state;
 	QPushButton *up;

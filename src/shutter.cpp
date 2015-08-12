@@ -6,7 +6,7 @@
 Shutter::Shutter(int address)
     : BusClient()
 {
-    chip = new AvrContainer();
+    chip = new AvrContainer(address);
     connect(chip, SIGNAL(started()), this, SLOT(avr_started()));
     connect(chip, SIGNAL(stateChanged(const char *)),
 	    this, SLOT(proxy_stateChanged(const char*)));

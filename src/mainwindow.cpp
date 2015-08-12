@@ -33,6 +33,12 @@ MainWindow::MainWindow()
        cw->show(c->getDirections());
        connect(shutters[i], SIGNAL(stateChanged(const char *)),
 	       shutterwidgets[i], SLOT(stateChanged(const char *)));
+       connect(shutterwidgets[i], SIGNAL(p_up()), shutters[i], SLOT(p_up()));
+       connect(shutterwidgets[i], SIGNAL(r_up()), shutters[i], SLOT(r_up()));
+       connect(shutterwidgets[i], SIGNAL(p_down()),
+	       shutters[i], SLOT(p_down()));
+       connect(shutterwidgets[i], SIGNAL(r_down()),
+	       shutters[i], SLOT(r_down()));
    }
 
    vbox->addLayout(hbox);

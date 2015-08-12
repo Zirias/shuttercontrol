@@ -12,13 +12,13 @@ AVR_MCU_SIMAVR_CONSOLE(&GPIOR0);
 
 ISR(PCINT1_vect)
 {
-    debugf("[%02x] interrupted.\r", eep_address);
+    debugf("[0x%x] interrupted.\r", eep_address);
 }
 
 int main (void)
 {
     eepdata_init();
-    debugf("[%02x] starting.\r", eep_address);
+    debugf("[0x%x] starting.\r", eep_address);
 
     GIMSK |= (1 << PCIE1);
     PCMSK1 |= (1 << PCINT8) | (1 << PCINT9) | (1 << PCINT10);
