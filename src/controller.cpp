@@ -7,7 +7,7 @@
 
 Controller::Controller()
     : BusClient(), clock(&BusClock::byId(BusClock::defClock)),
-    addr(0xf), action(0)
+    addr(0), action(0)
 {
     for (int i = 0; i < 0x10; ++i) lastDir[i] = dnone;
     timer = new QTimer(this);
@@ -23,7 +23,7 @@ Controller::~Controller()
 
 void Controller::connected()
 {
-    emit setDirections(0x18f);
+    emit setDirections(0xcf);
 }
 
 void Controller::readBus(int lines)

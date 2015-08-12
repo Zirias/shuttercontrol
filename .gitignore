@@ -4,6 +4,7 @@
 *.d
 *.map
 *.afx
+*.exe
 *_moc.cpp
 shuttercontrol
 

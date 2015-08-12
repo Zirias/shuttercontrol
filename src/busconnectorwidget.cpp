@@ -41,7 +41,7 @@ BusConnectorWidget::BusConnectorWidget(QWidget *parent)
     QGridLayout *layout = new QGridLayout();
     QLabel *lbl;
 
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 8; ++i)
     {
 	lbl = new QLabel(QString::number(i), this);
 	lbl->setAlignment(Qt::AlignHCenter);
@@ -55,7 +55,7 @@ BusConnectorWidget::BusConnectorWidget(QWidget *parent)
 
 void BusConnectorWidget::show(int lines)
 {
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 8; ++i)
     {
 	pins[i]->setDirection(lines & (1 << i));
     }

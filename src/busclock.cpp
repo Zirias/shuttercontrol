@@ -7,7 +7,7 @@ const BusClock BusClock::Slow(3, 500, "slow");
 const BusClock BusClock::UltraSlow(4, 2000, "slowest");
 
 const int BusClock::nClocks = 5;
-const int BusClock::defClock = 3;
+const int BusClock::defClock = 2;
 
 BusClock::BusClock(int id, int period, const char *name)
     : _id(id), _period(period), _name(name)

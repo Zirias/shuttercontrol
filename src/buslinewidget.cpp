@@ -20,7 +20,7 @@ void BusLineWidget::paintEvent(QPaintEvent *ev)
     QSize sz = size();
     QPainter painter(this);
     painter.setPen(
-	    QPen(isSet?Qt::green:Qt::gray, 7, Qt::SolidLine, Qt::RoundCap));
+	    QPen(isSet?Qt::cyan:Qt::black, 7, Qt::SolidLine, Qt::RoundCap));
     painter.drawLine(6, sz.height()/2, sz.width()-6, sz.height()/2);
 }
 

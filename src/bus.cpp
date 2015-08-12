@@ -6,9 +6,9 @@ Bus::Bus(int lines)
     : QObject(), lines(lines)
 {}
 
-void Bus::set(int lines)
+void Bus::set(int lines, int mask)
 {
-    this->lines = (Bus::Lines)lines;
+    this->lines = (Bus::Lines)(((int)this->lines & ~mask) | lines & mask);
     emit changed(this);
 }
 
@@ -34,8 +34,8 @@ BusConnector *Bus::connector()
 
     connect(this, SIGNAL(changed(const Bus *)),
 	    conn, SLOT(readBus(const Bus *)));
-    connect(conn, SIGNAL(writeBus(int)),
-	    this, SLOT(set(int)));
+    connect(conn, SIGNAL(writeBus(int, int)),
+	    this, SLOT(set(int, int)));
 
     return conn;
 }

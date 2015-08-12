@@ -13,7 +13,7 @@ BusWidget::BusWidget(QWidget *parent)
     QGridLayout *layout = new QGridLayout();
     QLabel *lbl;
 
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 8; ++i)
     {
 	lbl = new QLabel(
 		QString("[%1] %2").arg(i).arg(BusLineId::name(i)), this);
@@ -28,7 +28,7 @@ BusWidget::BusWidget(QWidget *parent)
 
 void BusWidget::show(const Bus *bus)
 {
-    for (int i = 0; i < 9; ++i)
+    for (int i = 0; i < 8; ++i)
     {
 	lines[i]->set(bus->isLineSet(i));
     }

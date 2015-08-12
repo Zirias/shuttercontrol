@@ -43,6 +43,7 @@ MainWindow::MainWindow()
 
    connect(&bus, SIGNAL(changed(const Bus *)),
 	   buswidget, SLOT(show(const Bus *)));
+   buswidget->show(&bus);
 
    controller.connectBus(&bus);
    BusConnector *busconn = controller.connector();

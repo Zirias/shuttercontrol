@@ -1,7 +1,7 @@
 #include "busconnector.h"
 
 BusConnector::BusConnector()
-    : QObject(), directions(0), readLines(0)
+    : QObject(), directions(0), readLines(0xff)
 {}
 
 int BusConnector::getDirections() const
@@ -26,12 +26,12 @@ void BusConnector::setDirections(int dir)
 
 void BusConnector::write(int lines)
 {
-    emit writeBus(lines & (int)directions);
+    emit writeBus(lines, (int)directions);
 }
 
 void BusConnector::readBus(const Bus *bus)
 {
-    Bus::Lines filtered = ~directions & (Bus::Lines) *bus;
+    Bus::Lines filtered = directions | (Bus::Lines) *bus;
     if (filtered != readLines)
     {
 	readLines = filtered;

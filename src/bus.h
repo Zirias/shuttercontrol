@@ -22,13 +22,12 @@ class Bus: public QObject
 	    A3 = 1 << BusLineId::A3,
 	    D0 = 1 << BusLineId::D0,
 	    D1 = 1 << BusLineId::D1,
-	    D2 = 1 << BusLineId::D2,
 	    BC = 1 << BusLineId::BC,
-	    IRQ = 1 << BusLineId::IRQ
+	    RS = 1 << BusLineId::RS
 	};
 	Q_DECLARE_FLAGS(Lines, Line)
 	
-	Bus(int lines = 0);
+	Bus(int lines = 0xff);
 
 	bool isLineSet(BusLineId::ID id) const;
 	bool isLineSet(int id) const;
@@ -36,7 +35,7 @@ class Bus: public QObject
 	BusConnector *connector();
 
     public slots:
-	void set(int lines);
+	void set(int lines, int mask);
 
     signals:
 	void changed(const Bus *bus);

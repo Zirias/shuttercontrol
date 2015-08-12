@@ -13,8 +13,8 @@ static QString addrlabel(const QString &a, int addr)
 {
     switch (addr)
     {
-	case 0x0: return a.arg(ControllerWidget::tr("NA"));
-	case 0xf: return a.arg(ControllerWidget::tr("BC"));
+	case 0x0: return a.arg(ControllerWidget::tr("BC"));
+	case 0xf: return a.arg(ControllerWidget::tr("NA"));
 	default: return a.arg(addr,2,10,QChar('0'));
     }
 }
@@ -47,7 +47,6 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     {
 	addrSelect->addItem(addrlabel(QString("0x%1: [%2]").arg(i,0,16), i));
     }
-    addrSelect->setCurrentIndex(0xf);
 
     hbox->addWidget(new QLabel(tr("addr:"), this));
     hbox->addWidget(addrSelect);

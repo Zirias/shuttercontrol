@@ -7,9 +7,8 @@ static const QString names[] = {
     "A3",
     "D0",
     "D1",
-    "D2",
     "BC",
-    "IRQ"
+    "RS"
 };
 
 static const QString err = "[ERR]";
@@ -18,7 +17,7 @@ BusLineId::BusLineId() {};
 
 const QString &BusLineId::name(BusLineId::ID id)
 {
-    if (id < 0 || id > IRQ) return err;
+    if (id < 0 || id > RS) return err;
     return names[id];
 }
 

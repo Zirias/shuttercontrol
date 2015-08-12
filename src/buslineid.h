@@ -18,9 +18,8 @@ class BusLineId: public QObject
 	    A3,
 	    D0,
 	    D1,
-	    D2,
 	    BC,
-	    IRQ
+	    RS
 	};
 
 	static const QString &name(ID id);

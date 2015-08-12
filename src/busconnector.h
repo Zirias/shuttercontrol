@@ -22,7 +22,7 @@ class BusConnector: public QObject
     signals:
 	void changed(int dir);
 	void readChanged(int lines);
-	void writeBus(int lines);
+	void writeBus(int lines, int mask);
 
     private:
 	Bus::Lines directions;
