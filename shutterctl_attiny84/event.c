@@ -163,22 +163,7 @@ static event *createPinchangeEvent(uint8_t newpins)
 {
     event *ev = event_create();
     ev->type = EV_PINCHANGE;
-    ev->data.pinchange = 0;
-    if ((pins & _BV(0)) != (newpins & _BV(0)))
-    {
-	if (newpins & _BV(0)) ev->data.pinchange |= EV_PC_UP_HI;
-	else ev->data.pinchange |= EV_PC_UP_LO;
-    }
-    if ((pins & _BV(1)) != (newpins & _BV(1)))
-    {
-	if (newpins & _BV(1)) ev->data.pinchange |= EV_PC_DOWN_HI;
-	else ev->data.pinchange |= EV_PC_DOWN_LO;
-    }
-    if ((pins & _BV(2)) != (newpins & _BV(2)))
-    {
-	if (newpins & _BV(2)) ev->data.pinchange |= EV_PC_BUSCLK_HI;
-	else ev->data.pinchange |= EV_PC_BUSCLK_LO;
-    }
+    ev->data = newpins;
     return ev;
 }
 
@@ -186,7 +171,7 @@ static event *createTickEvent(uint8_t oldticks)
 {
     event *ev = event_create();
     ev->type = EV_TICK;
-    ev->data.ticks = clockticks - oldticks;
+    ev->data = clockticks - oldticks;
     return ev;
 }
 

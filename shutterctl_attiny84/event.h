@@ -20,30 +20,10 @@ typedef enum ev_type
     EV_TIMER
 } ev_type;
 
-typedef enum ev_pinchange
-{
-    EV_PC_NONE = (1 << 0),
-    EV_PC_BUSCLK_HI = (1 << 1),
-    EV_PC_BUSCLK_LO = (1 << 2),
-    EV_PC_UP_HI = (1 << 3),
-    EV_PC_UP_LO = (1 << 4),
-    EV_PC_DOWN_HI = (1 << 5),
-    EV_PC_DOWN_LO = (1 << 6)
-} ev_pinchange;
-
-typedef uint8_t ev_tick;
-typedef timer ev_timer;
-
 struct event
 {
     ev_type type;
-    union
-    {
-	uint8_t custom;
-	ev_pinchange pinchange;
-	ev_tick ticks;
-	ev_timer timer;
-    } data;
+    uint8_t data;
 };
 
 void event_init(void);

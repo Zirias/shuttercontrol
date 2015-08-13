@@ -33,18 +33,18 @@ timer timer_create(ev_handler timeout, void *data)
 static void timerTick(const event *ev, void *data)
 {
     timer t = (timer)(int)data;
-    if (ev->data.ticks >= timers[t].ticks)
+    if (ev->data >= timers[t].ticks)
     {
 	event_unregister(timerTick, data);
 	timers[t].ticks = 0;
 	event *timerEvent = event_create();
 	timerEvent->type = EV_TIMER;
-	timerEvent->data.timer = t;
+	timerEvent->data = t;
 	timers[t].timeout(timerEvent, timers[t].data);
     }
     else
     {
-	timers[t].ticks -= ev->data.ticks;
+	timers[t].ticks -= ev->data;
     }
 }
 

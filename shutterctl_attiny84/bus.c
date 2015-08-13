@@ -12,14 +12,11 @@
 #define CMD_DOWN    0x02
 #define CMD_STOP    0x03
 
-uint8_t status = 0;
+static uint8_t status = 0;
 
 static void pinChanged(const event *ev, void *data)
 {
-    uint8_t busdata;
-
-    if (ev->data.pinchange != EV_PC_BUSCLK_HI) return;
-    busdata = PINA & 0x3f;
+    uint8_t busdata = PINA & 0x3f;
 
     if (status & ATN)
     {
@@ -79,8 +76,18 @@ static void pinChanged(const event *ev, void *data)
 
 static BOOL pinChangedFilter(const event *ev)
 {
-    return (ev->type == EV_PINCHANGE &&
-	    ev->data.pinchange == EV_PC_BUSCLK_HI);
+    static uint8_t pin = 1;
+
+    if (ev->type == EV_PINCHANGE)
+    {
+	if (!(ev->data & 0x4)) pin = 0;
+	else if (!pin)
+	{
+	    pin = 1;
+	    return TRUE;
+	}
+    }
+    return FALSE;
 }
 
 void bus_init(void)
