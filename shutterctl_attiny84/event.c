@@ -5,8 +5,8 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define EVBUFSIZE 16
-#define MAXEVHANDLERS 32
+#define EVBUFSIZE 8
+#define MAXEVHANDLERS 8
 
 volatile static uint8_t pinchanged = 0;
 volatile uint8_t clockticks = 0;

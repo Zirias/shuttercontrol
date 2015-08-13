@@ -23,7 +23,7 @@ Controller::~Controller()
 
 void Controller::connected()
 {
-    emit setDirections(0xcf);
+    emit setDirections(0xe0);
 }
 
 void Controller::readBus(int lines)

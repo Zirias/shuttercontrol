@@ -10,8 +10,8 @@ typedef struct
 
 extern eepdata eep;
 
-#define eep_version (eep.id >> 4)
-#define eep_address (eep.id & 0xf)
+#define eep_version (eep.id >> 5)
+#define eep_address (eep.id & 0x1f)
 
 void eepdata_init(void);
 

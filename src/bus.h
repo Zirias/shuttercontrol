@@ -16,12 +16,12 @@ class Bus: public QObject
     public:
 	enum Line
 	{
-	    A0 = 1 << BusLineId::A0,
-	    A1 = 1 << BusLineId::A1,
-	    A2 = 1 << BusLineId::A2,
-	    A3 = 1 << BusLineId::A3,
 	    D0 = 1 << BusLineId::D0,
 	    D1 = 1 << BusLineId::D1,
+	    D2 = 1 << BusLineId::D2,
+	    D3 = 1 << BusLineId::D3,
+	    D4 = 1 << BusLineId::D4,
+	    AT = 1 << BusLineId::AT,
 	    BC = 1 << BusLineId::BC,
 	    RS = 1 << BusLineId::RS
 	};

@@ -12,12 +12,12 @@ class BusLineId: public QObject
     public:
 	enum ID
 	{
-	    A0 = 0,
-	    A1,
-	    A2,
-	    A3,
-	    D0,
+	    D0 = 0,
 	    D1,
+	    D2,
+	    D3,
+	    D4,
+	    AT,
 	    BC,
 	    RS
 	};

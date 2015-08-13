@@ -18,10 +18,10 @@ int ControllerAction::Step::value() const
     return _value;
 }
 
-static const int cmd_status = 0x00;
-static const int cmd_up = 0x10;
-static const int cmd_down = 0x20;
-static const int cmd_stop = 0x30;
+static const int cmd_status = 0x20;
+static const int cmd_up = 0x21;
+static const int cmd_down = 0x22;
+static const int cmd_stop = 0x23;
 
 ControllerAction::ControllerAction(ControllerAction::Type type, int address)
     : _pos(-1), _address(address)
@@ -30,29 +30,45 @@ ControllerAction::ControllerAction(ControllerAction::Type type, int address)
     switch (type)
     {
 	case ControllerAction::Up:
-	    _steps.append(Step(Step::Write, 0x80 | cmd_up | address));
+	    _steps.append(Step(Step::Write, 0x80 | address));
 	    _steps.append(Step(Step::WaitClock));
-	    _steps.append(Step(Step::Write, 0xc0 | cmd_up | address));
+	    _steps.append(Step(Step::Write, 0xc0 | address));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0x80 | cmd_up));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0xc0 | cmd_up));
 	    break;
 	case ControllerAction::Down:
-	    _steps.append(Step(Step::Write, 0x80 | cmd_down | address));
+	    _steps.append(Step(Step::Write, 0x80 | address));
 	    _steps.append(Step(Step::WaitClock));
-	    _steps.append(Step(Step::Write, 0xc0 | cmd_down | address));
+	    _steps.append(Step(Step::Write, 0xc0 | address));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0x80 | cmd_down));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0xc0 | cmd_down));
 	    break;
 	case ControllerAction::Stop:
-	    _steps.append(Step(Step::Write, 0x80 | cmd_stop | address));
+	    _steps.append(Step(Step::Write, 0x80 | address));
 	    _steps.append(Step(Step::WaitClock));
-	    _steps.append(Step(Step::Write, 0xc0 | cmd_stop | address));
+	    _steps.append(Step(Step::Write, 0xc0 | address));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0x80 | cmd_stop));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0xc0 | cmd_stop));
 	    break;
 	case ControllerAction::Status:
-	    _steps.append(Step(Step::Write, 0x80 | cmd_status | address));
+	    _steps.append(Step(Step::Write, 0x80 | address));
 	    _steps.append(Step(Step::WaitClock));
-	    _steps.append(Step(Step::Write, 0xc0 | cmd_status | address));
+	    _steps.append(Step(Step::Write, 0xc0 | address));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0x80 | cmd_status));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0xc0 | cmd_status));
 	    break;
     }
     _steps.append(Step(Step::WaitClock));
     _steps.append(Step(Step::Write, 0xbf));
-    _steps.append(Step(Step::Direction, 0xcf));
+    _steps.append(Step(Step::Direction, 0xe0));
 
     if (type == ControllerAction::Status)
     {
