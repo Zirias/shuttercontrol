@@ -5,12 +5,27 @@
 #include "shutterctl.h"
 
 static timer buttonTimer;
-static uint8_t up;
+
+#define UP_REQ	    1<<0
+#define DOWN_REQ    1<<1
+#define STOP_REQ    1<<3
+#define UP_LO	    1<<4
+#define DOWN_LO	    1<<5
+
+static uint8_t state = 0;
 
 static void buttonTimeout(const event *ev, void *data)
 {
-    if (up) shutterctl_up(PRIO_MANUAL, FALSE);
-    else shutterctl_down(PRIO_MANUAL, FALSE);
+    if ((state & UP_REQ) && (state & UP_LO))
+    {
+	state &= ~UP_REQ;
+	shutterctl_up(PRIO_MANUAL, FALSE);
+    }
+    else if ((state & DOWN_REQ) && (state & DOWN_LO))
+    {
+	state &= ~DOWN_REQ;
+	shutterctl_down(PRIO_MANUAL, FALSE);
+    }
 }
 
 static void pinChanged(const event *ev, void *data)
@@ -19,9 +34,10 @@ static void pinChanged(const event *ev, void *data)
 
     if (ev->data.pinchange & EV_PC_UP_HI)
     {
+	state &= ~UP_LO;
 	if (ticks)
 	{
-	    if (ticks < 2) /* minimum 1 tick lo */
+	    if (ticks < 3) /* minimum 1 tick lo */
 	    {
 		timer_stop(buttonTimer);
 		shutterctl_up(PRIO_MANUAL, TRUE);
@@ -34,9 +50,10 @@ static void pinChanged(const event *ev, void *data)
     }
     else if (ev->data.pinchange & EV_PC_DOWN_HI)
     {
+	state &= ~DOWN_LO;
 	if (ticks)
 	{
-	    if (ticks < 2) /* minimum 1 tick lo */
+	    if (ticks < 3) /* minimum 1 tick lo */
 	    {
 		timer_stop(buttonTimer);
 		shutterctl_down(PRIO_MANUAL, TRUE);
@@ -49,26 +66,28 @@ static void pinChanged(const event *ev, void *data)
     }
     else if (ev->data.pinchange & EV_PC_UP_LO)
     {
+	state |= UP_LO;
 	if (shutterctl_isactive())
 	{
 	    shutterctl_stop(PRIO_MANUAL);
 	}
 	else
 	{
-	    up = 1;
-	    if (!ticks) timer_start(buttonTimer, 2);
+	    state |= UP_REQ;
+	    if (!ticks) timer_start(buttonTimer, 3);
 	}
     }
     else if (ev->data.pinchange & EV_PC_DOWN_LO)
     {
+	state |= DOWN_LO;
 	if (shutterctl_isactive())
 	{
 	    shutterctl_stop(PRIO_MANUAL);
 	}
 	else
 	{
-	    up = 0;
-	    if (!ticks) timer_start(buttonTimer, 2);
+	    state |= DOWN_REQ;
+	    if (!ticks) timer_start(buttonTimer, 3);
 	}
     }
 }

@@ -72,6 +72,7 @@ void event_enableTicks(void)
     TCCR1B |= _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
     OCR1A = 12500; /* 100 ms */
     set_sleep_mode(SLEEP_MODE_IDLE);
+    TCNT1 = 0;
     GTCCR &= ~_BV(TSM);
 }
 
@@ -201,14 +202,6 @@ void event_loop(void)
     {
 	while (pinchanged || clockticks != ticks)
 	{
-	    if (clockticks != ticks)
-	    {
-		cli();
-		ev = createTickEvent(ticks);
-		sei();
-		ticks = clockticks;
-		event_dispatch(ev);
-	    }
 	    if (pinchanged)
 	    {
 		newpins = PINB;
@@ -217,6 +210,14 @@ void event_loop(void)
 		pinchanged = 0;
 		pins = newpins;
 		sei();
+		event_dispatch(ev);
+	    }
+	    if (clockticks != ticks)
+	    {
+		cli();
+		ev = createTickEvent(ticks);
+		sei();
+		ticks = clockticks;
 		event_dispatch(ev);
 	    }
 	}

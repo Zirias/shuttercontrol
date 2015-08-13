@@ -12,7 +12,7 @@ AVR_MCU(8000000, "attiny84");
 AVR_MCU_VOLTAGES(3300, 3300, 3300);
 AVR_MCU_SIMAVR_CONSOLE(&GPIOR0);
 
-int main(void)
+void __attribute__((__noreturn__)) main(void)
 {
     /* initial pin configuration */
     DDRA = 0xc0;
