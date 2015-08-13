@@ -71,7 +71,6 @@ void event_enableTicks(void)
     GTCCR |= _BV(TSM) | _BV(PSR10);
     TCCR1B |= _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
     OCR1A = 12500; /* 100 ms */
-    clockticks = 0;
     set_sleep_mode(SLEEP_MODE_IDLE);
     GTCCR &= ~_BV(TSM);
 }
@@ -81,7 +80,6 @@ void event_disableTicks(void)
     if (--enableTicks) return;
     GTCCR |= _BV(TSM) | _BV(PSR10);
     TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));
-    clockticks = 0;
     set_sleep_mode(SLEEP_MODE_PWR_SAVE);
     GTCCR &= ~_BV(TSM);
     PRR |= _BV(PRTIM1);
