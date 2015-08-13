@@ -9,12 +9,13 @@ ADDRESS?= 1
 
 CFLAGS:= -std=gnu99 -Wall -Os -gdwarf-2 -mmcu=attiny84 -DF_CPU=8000000 \
     -DADDRESS=$(ADDRESS) \
-    -fno-inline-small-functions -ffunction-sections -fdata-sections
+    -fno-inline-small-functions -ffunction-sections -fdata-sections \
+    -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 LDFLAGS:= -Wl,--relax,--gc-sections \
     -Wl,--undefined=_mmcu,--section-start=.mmcu=0x910000,-Map=$(MAP)
 INCLUDES:= -I/usr/lib/avr/include -I/usr/local/include/simavr
 
-OBJS:= shutterctl.o eepdata.o
+OBJS:= main.o eepdata.o event.o timer.o
 
 ifeq ($(DEBUG),1)
 CFLAGS+= -DDEBUG
