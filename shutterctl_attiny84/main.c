@@ -7,6 +7,7 @@
 #include "timer.h"
 #include "shutterctl.h"
 #include "buttons.h"
+#include "bus.h"
 
 AVR_MCU(8000000, "attiny84");
 AVR_MCU_VOLTAGES(3300, 3300, 3300);
@@ -26,6 +27,7 @@ void __attribute__((__noreturn__)) main(void)
     timer_init();
     shutterctl_init();
     buttons_init();
+    bus_init();
 
     /* never come back */
     event_loop();

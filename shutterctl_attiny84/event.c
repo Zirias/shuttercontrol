@@ -60,8 +60,6 @@ void event_init(void)
 
     /* disable all integrated peripherals: */
     PRR |= _BV(PRTIM1) | _BV(PRTIM0) | _BV(PRUSI) | _BV(PRADC);
-    sei();
-    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
 }
 
 void event_enableTicks(void)
@@ -198,6 +196,8 @@ void event_loop(void)
     uint8_t ticks = clockticks;
     event *ev;
 
+    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+    sei();
     while (1)
     {
 	while (pinchanged || clockticks != ticks)

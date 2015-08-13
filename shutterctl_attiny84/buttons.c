@@ -92,8 +92,15 @@ static void pinChanged(const event *ev, void *data)
     }
 }
 
+static BOOL pinChangedFilter(const event *ev)
+{
+    return (ev->type == EV_PINCHANGE &&
+	    (ev->data.pinchange &
+	     (EV_PC_UP_HI|EV_PC_UP_LO|EV_PC_DOWN_HI|EV_PC_DOWN_LO)));
+}
+
 void buttons_init(void)
 {
-    event_onPinchange(pinChanged, 0);
+    event_register(pinChangedFilter, pinChanged, 0);
     buttonTimer = timer_create(buttonTimeout, 0);
 }

@@ -4,8 +4,8 @@
 #include <avr/io.h>
 
 #define shutter_stop() do { PORTA &= ~(_BV(PA6) | _BV(PA7)); } while (0)
-#define shutter_up() do { shutter_stop(); PORTA |= _BV(PA6); } while (0)
-#define shutter_down() do { shutter_stop(); PORTA |= _BV(PA7); } while (0)
+#define shutter_up() do { PORTA |= _BV(PA6); } while (0)
+#define shutter_down() do { PORTA |= _BV(PA7); } while (0)
 
 static timer shutterTimer;
 static uint8_t maxpos = 100;
@@ -51,23 +51,16 @@ void shutterctl_stop(shutterctl_prio prio)
     {
 	shutter_stop();
 	ticks = timer_ticks(shutterTimer);
+	timer_stop(shutterTimer);
 	elapsed = initticks - ticks;
 	if (state & UP)
 	{
-	    if (ticks)
-	    {
-		timer_stop(shutterTimer);
-		pos += (elapsed > maxpos ? maxpos : elapsed);
-	    }
+	    if (ticks) pos += (elapsed > maxpos ? maxpos : elapsed);
 	    else pos = maxpos;
 	}
 	else if (state & DOWN)
 	{
-	    if (ticks)
-	    {
-		timer_stop(shutterTimer);
-		pos -= (elapsed > maxpos ? maxpos : elapsed);
-	    }
+	    if (ticks) pos -= (elapsed > maxpos ? maxpos : elapsed);
 	    else pos = 0;
 	}
 	state = 0;
@@ -78,6 +71,7 @@ void shutterctl_up(shutterctl_prio prio, BOOL autostop)
 {
     if (prio >= (state & 0xf))
     {
+	shutterctl_stop(prio);
 	if (pos == INVALID_POS) pos = 0;
 	initticks = maxpos - pos + 10;
 	shutter_up();
@@ -91,6 +85,7 @@ void shutterctl_down(shutterctl_prio prio, BOOL autostop)
 {
     if (prio >= (state & 0xf))
     {
+	shutterctl_stop(prio);
 	if (pos == INVALID_POS) pos = maxpos;
 	initticks = pos + 10;
 	shutter_down();

@@ -15,7 +15,7 @@ LDFLAGS:= -Wl,--relax,--gc-sections \
     -Wl,--undefined=_mmcu,--section-start=.mmcu=0x910000,-Map=$(MAP)
 INCLUDES:= -I/usr/lib/avr/include -I/usr/local/include/simavr
 
-OBJS:= main.o eepdata.o event.o timer.o shutterctl.o buttons.o
+OBJS:= main.o eepdata.o event.o timer.o shutterctl.o buttons.o bus.o
 
 ifeq ($(DEBUG),1)
 CFLAGS+= -DDEBUG

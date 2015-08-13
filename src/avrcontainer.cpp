@@ -25,7 +25,7 @@ void AvrContainer::init()
 	emit finished();
 	return;
     }
-    fw->eeprom[0] = (fw->eeprom[0] & 0xe0) | (address & 0x1f);
+    fw->eeprom[0] = (fw->eeprom[0] & 0xf0) | (address & 0x0f);
     avr_init(avr);
     avr_load_firmware(avr, fw);
     delete fw;
