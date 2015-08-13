@@ -1,6 +1,6 @@
 CC:= avr-gcc
 
-TARGET:= shutterctl.afx
+TARGET:= ../shutterctl.afx
 MAP:= shutterctl.map
 
 DEBUG:= 1

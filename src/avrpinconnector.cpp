@@ -3,8 +3,6 @@
 #include <sim_avr.h>
 #include <avr_ioport.h>
 
-#include <QDebug>
-
 static const char *irqnames[] =
 {
     "PORTA_OUT",
@@ -164,7 +162,6 @@ void AvrPinConnector::handleIrq(avr_irq_t *irq, uint32_t value)
     switch (irq->irq)
     {
 	case AvrPinConnector::PORTA_OUT:
-	    qDebug() << "PORT A: " << value;
 	    l = port0tobus(lines, value);
 	    if (l != lines)
 	    {

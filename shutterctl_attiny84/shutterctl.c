@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 #include <avr/avr_mcu_section.h>
 
 #include "debug.h"
@@ -16,12 +17,17 @@ void loop(void) __attribute__((__noreturn__));
 #define BUS_READ 1
 
 volatile static uint8_t interrupted = 0;
+volatile static uint8_t elapsed = 0;
 static uint8_t b = 0xf;
 
 ISR(PCINT1_vect)
 {
     ++interrupted;
-    debugf("[0x%x] interrupted: %d.\r", eep_address, interrupted);
+}
+
+ISR(TIM1_COMPA_vect)
+{
+    ++elapsed;
 }
 
 int main(void)
@@ -32,12 +38,32 @@ int main(void)
     PORTB = 0x0f;
 
     eepdata_init();
-    debugf("[0x%x] starting.\r", eep_address);
 
-    GIMSK |= (1 << PCIE1);
-    PCMSK1 |= (1 << PCINT8) | (1 << PCINT9) | (1 << PCINT10);
+    GIMSK |= _BV(PCIE1);
+    PCMSK1 |= _BV(PCINT8) | _BV(PCINT9) | _BV(PCINT10);
+    TIMSK1 |= _BV(OCIE1A);
     sei();
+    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
     loop();
+}
+
+void startTimer(void)
+{
+    GTCCR |= _BV(TSM) | _BV(PSR10);
+    TCCR1B |= _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
+    OCR1A = 12500; /* 100 ms */
+    elapsed = 0;
+    set_sleep_mode(SLEEP_MODE_IDLE);
+    GTCCR &= ~_BV(TSM);
+}
+
+void stopTimer(void)
+{
+    GTCCR |= _BV(TSM) | _BV(PSR10);
+    TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));
+    elapsed = 0;
+    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+    GTCCR &= ~_BV(TSM);
 }
 
 void loop(void)
@@ -45,21 +71,66 @@ void loop(void)
     uint8_t lastb = b;
     while(1) {
 	if (!interrupted) __asm__("sleep");
-	--interrupted;
-	b = PINB;
-	if (lastb == b) continue;
-	debugf("PINB: 0x%02x\r", b);
-	if ((b & 1) != (lastb & 1))
+	if (interrupted)
 	{
-	    if (b & 1) PORTA &= ~(_BV(6));
-	    else PORTA |= _BV(6);
+	    --interrupted;
+	    b = PINB;
+	    if (lastb == b) continue;
+	    if ((b & 1) != (lastb & 1))
+	    {
+		if (b & 1)
+		{
+		    if (elapsed > 2)
+		    {
+			stopTimer();
+			PORTA &= ~_BV(PA6);
+		    }
+		}
+		else
+		{
+		    if (elapsed)
+		    {
+			stopTimer();
+			PORTA &= ~(_BV(PA6) | _BV(PA7));
+		    }
+		    else
+		    {
+			PORTA |= _BV(PA6);
+			startTimer();
+		    }
+		}
+	    }
+	    else if ((b & 2) != (lastb & 2))
+	    {
+		if (b & 2)
+		{
+		    if (elapsed > 2)
+		    {
+			stopTimer();
+			PORTA &= ~_BV(PA7);
+		    }
+		}
+		else
+		{
+		    if (elapsed)
+		    {
+			stopTimer();
+			PORTA &= ~(_BV(PA6) | _BV(PA7));
+		    }
+		    else
+		    {
+			PORTA |= _BV(PA7);
+			startTimer();
+		    }
+		}
+	    }
+	    lastb = b;
 	}
-	else if ((b & 2) != (lastb & 2))
+	if (elapsed > 100)
 	{
-	    if (b & 2) PORTA &= ~(_BV(7));
-	    else PORTA |= _BV(7);
+	    stopTimer();
+	    PORTA &= ~(_BV(PA6) | _BV(PA7));
 	}
-	lastb = b;
     }
     __builtin_unreachable();
 }

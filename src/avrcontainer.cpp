@@ -17,7 +17,7 @@ AvrPinConnector *AvrContainer::getConnector()
 void AvrContainer::init()
 {
     elf_firmware_t *fw = new elf_firmware_t;
-    elf_read_firmware("shutterctl_attiny84/shutterctl.afx", fw);
+    elf_read_firmware("shutterctl.afx", fw);
     avr = avr_make_mcu_by_name(fw->mmcu);
     if (!avr)
     {
