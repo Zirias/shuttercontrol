@@ -12,7 +12,7 @@ static timer buttonTimer;
 #define DOWN_REQ    0x20
 #define PINMASK	    0x03
 
-static uint8_t state = 0;
+static uint8_t state = PINMASK;
 
 static void buttonTimeout(const event *ev, void *data)
 {
