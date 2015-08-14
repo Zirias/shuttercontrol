@@ -88,15 +88,12 @@ event *event_create(void)
 
 BOOL event_register(ev_filter filter, ev_handler handler, void *data)
 {
-    uint8_t ssave = SREG;
-    cli();
     for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
     {
 	if (handlers[i].handler)
 	{
 	    if (handlers[i].handler == handler && handlers[i].data == data)
 	    {
-		SREG = ssave;
 		return TRUE;
 	    }
 	    continue;
@@ -105,17 +102,13 @@ BOOL event_register(ev_filter filter, ev_handler handler, void *data)
 	handlers[i].filter = filter;
 	handlers[i].data = data;
 	if (filter == filterTick) event_enableTicks();
-	SREG = ssave;
 	return TRUE;
     }
-    SREG = ssave;
     return FALSE;
 }
 
 BOOL event_unregister(ev_handler handler, void *data)
 {
-    uint8_t ssave = SREG;
-    cli();
     for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
     {
 	if (handlers[i].handler != handler || handlers[i].data != data)
@@ -124,10 +117,8 @@ BOOL event_unregister(ev_handler handler, void *data)
 	}
 	handlers[i].handler = 0;
 	if (handlers[i].filter == filterTick) event_disableTicks();
-	SREG = ssave;
 	return TRUE;
     }
-    SREG = ssave;
     return FALSE;
 }
 
