@@ -9,8 +9,8 @@
 #include "buttons.h"
 #include "bus.h"
 
-AVR_MCU(8000000, "attiny84");
-AVR_MCU_VOLTAGES(3300, 3300, 3300);
+AVR_MCU(1000000, "attiny84");
+AVR_MCU_VOLTAGES(5000, 5000, 5000);
 AVR_MCU_SIMAVR_CONSOLE(&GPIOR0);
 
 void __attribute__((__noreturn__)) main(void)

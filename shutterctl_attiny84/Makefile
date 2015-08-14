@@ -7,11 +7,11 @@ DEBUG:= 1
 
 ADDRESS?= 1
 
-CFLAGS:= -std=gnu99 -Wall -Os -gdwarf-2 -mmcu=attiny84 -DF_CPU=8000000 \
+CFLAGS:= -std=gnu99 -Wall -Os -g0 -mmcu=attiny84 -DF_CPU=8000000 \
     -DADDRESS=$(ADDRESS) -ffreestanding \
     -fno-inline-small-functions -ffunction-sections -fdata-sections \
     -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-LDFLAGS:= -Wl,--relax,--gc-sections \
+LDFLAGS:= -Wl,--relax,--gc-sections,-s \
     -Wl,--undefined=_mmcu,--section-start=.mmcu=0x910000,-Map=$(MAP)
 INCLUDES:= -I/usr/lib/avr/include -I/usr/local/include/simavr
 
