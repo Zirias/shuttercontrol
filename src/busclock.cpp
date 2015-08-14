@@ -1,8 +1,8 @@
 #include "busclock.h"
 
-const BusClock BusClock::UltraFast(0, 50, "fastest");
-const BusClock BusClock::Fast(1, 100, "fast");
-const BusClock BusClock::Medium(2, 200, "medium");
+const BusClock BusClock::UltraFast(0, 25, "fastest");
+const BusClock BusClock::Fast(1, 50, "fast");
+const BusClock BusClock::Medium(2, 100, "medium");
 const BusClock BusClock::Slow(3, 500, "slow");
 const BusClock BusClock::UltraSlow(4, 1000, "slowest");
 

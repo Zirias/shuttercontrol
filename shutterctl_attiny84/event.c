@@ -58,8 +58,13 @@ void event_init(void)
     PCMSK1 |= _BV(PCINT8) | _BV(PCINT9) | _BV(PCINT10);
     TIMSK1 |= _BV(OCIE1A);
 
-    /* disable all integrated peripherals: */
+    /* power management, disable unused stuff: */
     PRR |= _BV(PRTIM1) | _BV(PRTIM0) | _BV(PRUSI) | _BV(PRADC);
+    MCUCR &= ~(_BV(BODS) | _BV(BODSE));
+    MCUCR |= _BV(BODS);
+    MCUCR &= ~_BV(BODSE);
+    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
+    sleep_enable();
 }
 
 void event_enableTicks(void)
@@ -67,9 +72,9 @@ void event_enableTicks(void)
     if (enableTicks++) return;
     PRR &= ~_BV(PRTIM1);
     GTCCR |= _BV(TSM) | _BV(PSR10);
-    TCCR1B |= _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
+//  TCCR1B = _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
+    TCCR1B = _BV(WGM12) | _BV(CS11); /* CTC, 1MHz / 8 */
     OCR1A = 12500; /* 100 ms */
-    set_sleep_mode(SLEEP_MODE_IDLE);
     TCNT1 = 0;
     GTCCR &= ~_BV(TSM);
 }
@@ -79,7 +84,6 @@ void event_disableTicks(void)
     if (--enableTicks) return;
     GTCCR |= _BV(TSM) | _BV(PSR10);
     TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));
-    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
     GTCCR &= ~_BV(TSM);
     PRR |= _BV(PRTIM1);
 }
@@ -174,14 +178,12 @@ static event *createTickEvent(uint8_t oldticks)
     ev->data = clockticks - oldticks;
     return ev;
 }
-
 void event_loop(void)
 {
     uint8_t newpins = 0;
     uint8_t ticks = clockticks;
     event *ev;
 
-    set_sleep_mode(SLEEP_MODE_PWR_SAVE);
     sei();
     while (1)
     {
@@ -206,7 +208,7 @@ void event_loop(void)
 		event_dispatch(ev);
 	    }
 	}
-	__asm__ volatile("sleep");
+	if (!enableTicks) __asm__ volatile("sleep");
     }
     UNREACHABLE();
 }
