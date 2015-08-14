@@ -54,15 +54,18 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     vbox->addLayout(hbox);
 
     upButton = new QPushButton(tr("up"), this);
+    stopButton = new QPushButton(tr("stop"), this);
     downButton = new QPushButton(tr("down"), this);
 
     vbox->addWidget(upButton);
+    vbox->addWidget(stopButton);
     vbox->addWidget(downButton);
     vbox->addWidget(connector);
 
     setLayout(vbox);
 
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(stopButton, SIGNAL(clicked()), this, SLOT(stopClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
     connect(clockSelect, SIGNAL(currentIndexChanged(int)),
 	    this, SLOT(clockSelected(int)));
@@ -73,6 +76,11 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
 void ControllerWidget::upClicked()
 {
     emit up();
+}
+
+void ControllerWidget::stopClicked()
+{
+    emit stop();
 }
 
 void ControllerWidget::downClicked()

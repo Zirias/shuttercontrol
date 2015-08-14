@@ -21,6 +21,7 @@ class Controller: public BusClient
 	virtual void readBus(int lines);
 	void up();
 	void down();
+	void stop();
 	void setClock(const BusClock *clock);
 	void setAddr(int addr);
 
@@ -38,7 +39,6 @@ class Controller: public BusClient
 	QQueue<ControllerAction *> pending;
 	const BusClock *clock;
 	int addr;
-	enum { dnone, dup, ddown } lastDir[0x10];
 };
 
 #endif

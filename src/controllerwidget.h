@@ -17,18 +17,21 @@ class ControllerWidget: public QGroupBox
     private slots:
 	void upClicked();
 	void downClicked();
+	void stopClicked();
 	void clockSelected(int index);
 	void addrSelected(int index);
 
     signals:
 	void up();
 	void down();
+	void stop();
 	void selectClock(const BusClock *clock);
 	void selectAddr(int addr);
 
     private:
 	QPushButton *upButton;
 	QPushButton *downButton;
+	QPushButton *stopButton;
 	QComboBox *clockSelect;
 	QComboBox *addrSelect;
 };

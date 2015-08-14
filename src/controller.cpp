@@ -9,7 +9,6 @@ Controller::Controller()
     : BusClient(), clock(&BusClock::byId(BusClock::defClock)),
     addr(0), action(0)
 {
-    for (int i = 0; i < 0x10; ++i) lastDir[i] = dnone;
     timer = new QTimer(this);
     timer->setInterval(clock->period());
     connect(timer, SIGNAL(timeout()), this, SLOT(step()));
@@ -32,28 +31,17 @@ void Controller::readBus(int lines)
 
 void Controller::up()
 {
-    if (lastDir[addr] == dup)
-    {
-	startAction(new ControllerAction(ControllerAction::Stop, addr));
-    }
-    else
-    {
-	lastDir[addr] = dup;
-	startAction(new ControllerAction(ControllerAction::Up, addr));
-    }
+    startAction(new ControllerAction(ControllerAction::Up, addr));
 }
 
 void Controller::down()
 {
-    if (lastDir[addr] == ddown)
-    {
-	startAction(new ControllerAction(ControllerAction::Stop, addr));
-    }
-    else
-    {
-	lastDir[addr] = ddown;
-	startAction(new ControllerAction(ControllerAction::Down, addr));
-    }
+    startAction(new ControllerAction(ControllerAction::Down, addr));
+}
+
+void Controller::stop()
+{
+    startAction(new ControllerAction(ControllerAction::Stop, addr));
 }
 
 void Controller::setClock(const BusClock *clock)

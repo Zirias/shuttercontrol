@@ -64,6 +64,7 @@ MainWindow::MainWindow()
    controllerConnector->show(busconn->getDirections());
 
    connect(controllerwidget, SIGNAL(up()), &controller, SLOT(up()));
+   connect(controllerwidget, SIGNAL(stop()), &controller, SLOT(stop()));
    connect(controllerwidget, SIGNAL(down()), &controller, SLOT(down()));
    connect(controllerwidget, SIGNAL(selectClock(const BusClock *)),
 	   &controller, SLOT(setClock(const BusClock *)));
