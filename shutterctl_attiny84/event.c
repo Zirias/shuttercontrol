@@ -58,7 +58,7 @@ static void enableTicks(void)
     GTCCR |= _BV(TSM) | _BV(PSR10);
 //  TCCR1B = _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
     TCCR1B = _BV(WGM12) | _BV(CS11); /* CTC, 1MHz / 8 */
-    OCR1A = 12500; /* 100 ms */
+    OCR1A = 1250; /* 10 ms */
     TCNT1 = 0;
     GTCCR &= ~_BV(TSM);
 }

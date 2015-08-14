@@ -6,7 +6,7 @@
 
 typedef struct timer_record
 {
-    uint8_t ticks;
+    uint16_t ticks;
     ev_handler timeout;
     void *data;
 } timer_record;
@@ -47,13 +47,13 @@ static void timerTick(const event *ev, void *data)
     }
 }
 
-void timer_start(timer timer, uint8_t ticks)
+void timer_start(timer timer, uint16_t ticks)
 {
     event_register(EV_TICK, timerTick, 0, (void *)(int)timer);
     timers[timer].ticks = ticks;
 }
 
-uint8_t timer_ticks(timer timer)
+uint16_t timer_ticks(timer timer)
 {
     return timers[timer].ticks;
 }

@@ -10,8 +10,8 @@ typedef uint8_t timer;
 
 void timer_init(void);
 timer timer_create(ev_handler timeout, void *data);
-void timer_start(timer timer, uint8_t ticks);
-uint8_t timer_ticks(timer timer);
+void timer_start(timer timer, uint16_t ticks);
+uint16_t timer_ticks(timer timer);
 void timer_stop(timer timer);
 void timer_destroy(timer timer);
 

@@ -8,8 +8,8 @@
 #define shutter_down() do { PORTA |= _BV(PA7); } while (0)
 
 static timer shutterTimer;
-static uint8_t maxpos = 100;
-static uint8_t pos = 0xff;
+static uint16_t maxpos = 1000;
+static uint16_t pos = 0xffff;
 
 #define STOPPED	    0x00
 #define UP	    0x10
@@ -17,7 +17,7 @@ static uint8_t pos = 0xff;
 #define AUTOSTOP    0x80
 
 static uint8_t state = 0;
-static uint8_t initticks = 0;
+static uint16_t initticks = 0;
 
 static void shutterTimeout(const event *ev, void *data)
 {
@@ -43,8 +43,8 @@ void shutterctl_init(void)
 
 void shutterctl_stop(shutterctl_prio prio)
 {
-    uint8_t ticks;
-    uint8_t elapsed;
+    uint16_t ticks;
+    uint16_t elapsed;
 
     if (!(state & 0xf0)) return;
     if (prio >= (state & 0xf))
@@ -73,7 +73,7 @@ void shutterctl_up(shutterctl_prio prio, BOOL autostop)
     {
 	shutterctl_stop(prio);
 	if (pos == INVALID_POS) pos = 0;
-	initticks = maxpos - pos + 10;
+	initticks = maxpos - pos + 100;
 	shutter_up();
 	state = prio | UP;
 	if (autostop) state |= AUTOSTOP;
@@ -87,7 +87,7 @@ void shutterctl_down(shutterctl_prio prio, BOOL autostop)
     {
 	shutterctl_stop(prio);
 	if (pos == INVALID_POS) pos = maxpos;
-	initticks = pos + 10;
+	initticks = pos + 100;
 	shutter_down();
 	state = prio | DOWN;
 	if (autostop) state |= AUTOSTOP;
@@ -102,11 +102,11 @@ BOOL shutterctl_isactive(void)
 
 uint8_t shutterctl_pos(void)
 {
-    return pos;
+    return (pos>>4)&0xff;
 }
 
 uint8_t shutterctl_maxpos(void)
 {
-    return maxpos;
+    return (maxpos>>4)&0xff;
 }
 
