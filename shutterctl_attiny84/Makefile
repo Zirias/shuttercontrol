@@ -1,4 +1,5 @@
 CC:= avr-gcc
+AVRSIZE:= avr-size -C
 
 TARGET:= ../shutterctl.afx
 MAP:= shutterctl.map
@@ -15,7 +16,7 @@ LDFLAGS:= -Wl,--relax,--gc-sections,-s \
     -Wl,--undefined=_mmcu,--section-start=.mmcu=0x910000,-Map=$(MAP)
 INCLUDES:= -I/usr/lib/avr/include -I/usr/local/include/simavr
 
-OBJS:= main.o eepdata.o event.o timer.o shutterctl.o buttons.o bus.o
+OBJS:= init.o main.o eepdata.o event.o timer.o shutterctl.o buttons.o bus.o
 
 ifeq ($(DEBUG),1)
 CFLAGS+= -DDEBUG
@@ -25,6 +26,9 @@ endif
 include ../mk/silent.mk
 
 all: $(TARGET)
+ifneq ($(AVRSIZE),)
+	$(VR)$(AVRSIZE) $(TARGET)
+endif
 
 $(MAP): $(TARGET)
 
@@ -41,6 +45,10 @@ ifneq ($(MAKECMDGOALS),distclean)
 -include $(OBJS:.o=.d)
 endif
 endif
+
+%.o: %.S Makefile
+	$(VCC)
+	$(VR)$(CC) -c -o$@ $(CFLAGS) $(INCLUDES) $<
 
 %.o: %.c Makefile
 	$(VCC)
