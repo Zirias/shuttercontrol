@@ -2,11 +2,11 @@
 #define TIMER_H
 
 #include "common.h"
+#include "event.h"
 
-typedef uint8_t timer;
 #define INVALID_TIMER 0xff
 
-#include "event.h"
+typedef uint8_t timer;
 
 void timer_init(void);
 timer timer_create(ev_handler timeout, void *data);

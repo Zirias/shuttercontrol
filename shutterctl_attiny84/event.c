@@ -5,18 +5,11 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define EVBUFSIZE 4
-#define EVQUEUESIZE 8
-#define MAXEVHANDLERS 8
-
-static event events[EVBUFSIZE];
-static uint8_t nextevent = 0;
-
 static event equeue[EVQUEUESIZE];
 volatile static uint8_t eqhead = 0;
 static uint8_t eqtail = 0;
 
-static uint8_t enableTicks = 0;
+static uint8_t ticksEnabled = 0;
 
 typedef struct evhdl_record
 {
@@ -25,24 +18,16 @@ typedef struct evhdl_record
     void *data;
 } evhdl_record;
 
-static evhdl_record handlers[MAXEVHANDLERS];
-
-static BOOL filterPinchange(const event *ev)
+typedef struct evhdl_vector
 {
-    return ev->type == EV_PINCHANGE;
-}
+    uint8_t nhandlers;
+    evhdl_record handlers[MAXEVHANDLERS];
+} evhdl_vector;
 
-static BOOL filterTick(const event *ev)
-{
-    return ev->type == EV_TICK;
-}
+static evhdl_vector handlervector[NUMEVTYPES];
 
 void event_init(void)
 {
-    /* clean state: */
-    memset(events, 0, sizeof(events));
-    memset(handlers, 0, sizeof(handlers));
-
     /* configure interrupts: */
     GIMSK |= _BV(PCIE1);
     PCMSK1 |= _BV(PCINT8) | _BV(PCINT9) | _BV(PCINT10);
@@ -57,9 +42,18 @@ void event_init(void)
     sleep_enable();
 }
 
-void event_enableTicks(void)
+void event_raise(ev_type type, uint8_t ev_data)
 {
-    if (enableTicks++) return;
+    cli();
+    equeue[eqhead].type = type;
+    equeue[eqhead].data = ev_data;
+    if (++eqhead == EVQUEUESIZE) eqhead = 0;
+    sei();
+}
+
+static void enableTicks(void)
+{
+    if (ticksEnabled++) return;
     PRR &= ~_BV(PRTIM1);
     GTCCR |= _BV(TSM) | _BV(PSR10);
 //  TCCR1B = _BV(WGM12) | _BV(CS10) | _BV(CS11); /* CTC, 8MHz / 64 */
@@ -69,67 +63,55 @@ void event_enableTicks(void)
     GTCCR &= ~_BV(TSM);
 }
 
-void event_disableTicks(void)
+static void disableTicks(void)
 {
-    if (--enableTicks) return;
+    if (ticksEnabled && --ticksEnabled) return;
     GTCCR |= _BV(TSM) | _BV(PSR10);
     TCCR1B &= ~(_BV(CS10) | _BV(CS11) | _BV(CS12));
     GTCCR &= ~_BV(TSM);
     PRR |= _BV(PRTIM1);
 }
 
-event *event_create(void)
-{
-    event *ev = &(events[nextevent]);
-    ++nextevent;
-    if (nextevent == EVBUFSIZE) nextevent = 0;
-    return ev;
-}
-
-BOOL event_register(ev_filter filter, ev_handler handler, void *data)
+BOOL event_register(ev_type type, ev_handler handler,
+	ev_filter filter, void *data)
 {
     for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
     {
-	if (handlers[i].handler)
+	if (handlervector[type].handlers[i].handler)
 	{
-	    if (handlers[i].handler == handler && handlers[i].data == data)
+	    if (handlervector[type].handlers[i].handler == handler
+		    && handlervector[type].handlers[i].data == data)
 	    {
+		handlervector[type].handlers[i].filter = filter;
 		return TRUE;
 	    }
 	    continue;
 	}
-	handlers[i].handler = handler;
-	handlers[i].filter = filter;
-	handlers[i].data = data;
-	if (filter == filterTick) event_enableTicks();
+	handlervector[type].handlers[i].handler = handler;
+	handlervector[type].handlers[i].filter = filter;
+	handlervector[type].handlers[i].data = data;
+	++handlervector[type].nhandlers;
+	if (type == EV_TICK) enableTicks();
 	return TRUE;
     }
     return FALSE;
 }
 
-BOOL event_unregister(ev_handler handler, void *data)
+BOOL event_unregister(ev_type type, ev_handler handler, void *data)
 {
     for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
     {
-	if (handlers[i].handler != handler || handlers[i].data != data)
+	if (handlervector[type].handlers[i].handler != handler
+		|| handlervector[type].handlers[i].data != data)
 	{
 	    continue;
 	}
-	handlers[i].handler = 0;
-	if (handlers[i].filter == filterTick) event_disableTicks();
+	handlervector[type].handlers[i].handler = 0;
+	--handlervector[type].nhandlers;
+	if (type == EV_TICK) disableTicks();
 	return TRUE;
     }
     return FALSE;
-}
-
-BOOL event_onPinchange(ev_handler handler, void *data)
-{
-    return event_register(filterPinchange, handler, data);
-}
-
-BOOL event_onTick(ev_handler handler, void *data)
-{
-    return event_register(filterTick, handler, data);
 }
 
 ISR(PCINT1_vect)
@@ -151,19 +133,29 @@ void event_loop(void)
     sei();
     while (1)
     {
+	/* run event queue */
 	while (eqtail != eqhead)
 	{
-	    for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
+	    event *ev = &(equeue[eqtail]);
+	    evhdl_vector *v = &(handlervector[ev->type]);
+	    if (v->nhandlers)
 	    {
-		if (!handlers[i].handler) continue;
-		if (handlers[i].filter(&(equeue[eqtail])))
+		for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
 		{
-		    handlers[i].handler(&(equeue[eqtail]), handlers[i].data);
+		    if (!(v->handlers[i].handler)) continue;
+		    if (!(v->handlers[i].filter) ||
+			    v->handlers[i].filter(ev,
+				v->handlers[i].handler, v->handlers[i].data))
+		    {
+			v->handlers[i].handler(ev, v->handlers[i].data);
+		    }
 		}
 	    }
 	    if (++eqtail == EVQUEUESIZE) eqtail = 0;
 	}
-	if (!enableTicks) __asm__ volatile("sleep");
+
+	/* sleep if no more events are pending and no timer tick enabled */
+	if (!ticksEnabled) __asm__ volatile("sleep");
     }
     UNREACHABLE();
 }

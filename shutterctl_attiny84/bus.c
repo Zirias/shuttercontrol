@@ -74,23 +74,20 @@ static void pinChanged(const event *ev, void *data)
     }
 }
 
-static BOOL pinChangedFilter(const event *ev)
+static BOOL pinChangedFilter(const event *ev, ev_handler handler, void *data)
 {
     static uint8_t pin = 1;
 
-    if (ev->type == EV_PINCHANGE)
+    if (!(ev->data & 0x4)) pin = 0;
+    else if (!pin)
     {
-	if (!(ev->data & 0x4)) pin = 0;
-	else if (!pin)
-	{
-	    pin = 1;
-	    return TRUE;
-	}
+	pin = 1;
+	return TRUE;
     }
     return FALSE;
 }
 
 void bus_init(void)
 {
-    event_register(pinChangedFilter, pinChanged, 0);
+    event_register(EV_PINCHANGE, pinChanged, pinChangedFilter, 0);
 }
