@@ -1,5 +1,7 @@
+AVRDEV:= attiny84
+
 CC:= avr-gcc
-AVRSIZE:= avr-size -C
+AVRSIZE:= avr-size
 
 TARGET:= ../shutterctl.afx
 MAP:= shutterctl.map
@@ -8,7 +10,7 @@ DEBUG:= 1
 
 ADDRESS?= 1
 
-CFLAGS:= -std=gnu99 -Wall -Os -g0 -mmcu=attiny84 -DF_CPU=8000000 \
+CFLAGS:= -std=gnu99 -Wall -Os -g0 -mmcu=$(AVRDEV) -DF_CPU=8000000 \
     -DADDRESS=$(ADDRESS) -ffreestanding \
     -fno-inline-small-functions -ffunction-sections -fdata-sections \
     -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
@@ -26,15 +28,15 @@ endif
 include ../mk/silent.mk
 
 all: $(TARGET)
-ifneq ($(AVRSIZE),)
-	$(VR)$(AVRSIZE) $(TARGET)
-endif
 
 $(MAP): $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(VCCLD)
 	$(VR)$(CC) -o$@ $(CFLAGS) $(LDFLAGS) $^
+ifneq ($(AVRSIZE),)
+	$(VR)$(AVRSIZE) -C --mcu=$(AVRDEV) $(TARGET)
+endif
 
 %.d: %.c Makefile
 	$(VDEP)
