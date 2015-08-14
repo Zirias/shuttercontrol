@@ -5,14 +5,16 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define EVBUFSIZE 8
+#define EVBUFSIZE 4
+#define EVQUEUESIZE 8
 #define MAXEVHANDLERS 8
-
-volatile static uint8_t pinchanged = 0;
-volatile uint8_t clockticks = 0;
 
 static event events[EVBUFSIZE];
 static uint8_t nextevent = 0;
+
+static event equeue[EVQUEUESIZE];
+volatile static uint8_t eqhead = 0;
+static uint8_t eqtail = 0;
 
 static uint8_t enableTicks = 0;
 
@@ -24,18 +26,6 @@ typedef struct evhdl_record
 } evhdl_record;
 
 static evhdl_record handlers[MAXEVHANDLERS];
-
-static uint8_t pins = 0xf;
-
-ISR(PCINT1_vect)
-{
-    pinchanged = 1;
-}
-
-ISR(TIM1_COMPA_vect)
-{
-    ++clockticks;
-}
 
 static BOOL filterPinchange(const event *ev)
 {
@@ -151,62 +141,36 @@ BOOL event_onTick(ev_handler handler, void *data)
     return event_register(filterTick, handler, data);
 }
 
-void event_dispatch(event *ev)
+ISR(PCINT1_vect)
 {
-    for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
-    {
-	if (!handlers[i].handler) continue;
-	if (handlers[i].filter(ev))
-	{
-	    handlers[i].handler(ev, handlers[i].data);
-	}
-    }
+    uint8_t pins = PINB;
+    equeue[eqhead].type = EV_PINCHANGE;
+    equeue[eqhead].data = pins;
+    if (++eqhead == EVQUEUESIZE) eqhead = 0;
 }
 
-static event *createPinchangeEvent(uint8_t newpins)
+ISR(TIM1_COMPA_vect)
 {
-    event *ev = event_create();
-    ev->type = EV_PINCHANGE;
-    ev->data = newpins;
-    return ev;
+    equeue[eqhead].type = EV_TICK;
+    if (++eqhead == EVQUEUESIZE) eqhead = 0;
 }
 
-static event *createTickEvent(uint8_t oldticks)
-{
-    event *ev = event_create();
-    ev->type = EV_TICK;
-    ev->data = clockticks - oldticks;
-    return ev;
-}
 void event_loop(void)
 {
-    uint8_t newpins = 0;
-    uint8_t ticks = clockticks;
-    event *ev;
-
     sei();
     while (1)
     {
-	while (pinchanged || clockticks != ticks)
+	while (eqtail != eqhead)
 	{
-	    if (pinchanged)
+	    for (uint8_t i = 0; i < MAXEVHANDLERS; ++i)
 	    {
-		newpins = PINB;
-		cli();
-		ev = createPinchangeEvent(newpins);
-		pinchanged = 0;
-		pins = newpins;
-		sei();
-		event_dispatch(ev);
+		if (!handlers[i].handler) continue;
+		if (handlers[i].filter(&(equeue[eqtail])))
+		{
+		    handlers[i].handler(&(equeue[eqtail]), handlers[i].data);
+		}
 	    }
-	    if (clockticks != ticks)
-	    {
-		cli();
-		ev = createTickEvent(ticks);
-		sei();
-		ticks = clockticks;
-		event_dispatch(ev);
-	    }
+	    if (++eqtail == EVQUEUESIZE) eqtail = 0;
 	}
 	if (!enableTicks) __asm__ volatile("sleep");
     }

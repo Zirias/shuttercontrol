@@ -30,7 +30,6 @@ void event_init(void);
 void event_enableTicks(void);
 void event_disableTicks(void);
 event *event_create(void);
-void event_dispatch(event *ev);
 BOOL event_register(ev_filter filter, ev_handler handler, void *data);
 BOOL event_unregister(ev_handler handler, void *data);
 BOOL event_onPinchange(ev_handler handler, void *data);
