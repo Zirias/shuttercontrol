@@ -115,9 +115,8 @@ BOOL event_unregister(ev_type type, ev_handler handler, void *data)
 
 ISR(PCINT1_vect)
 {
-    uint8_t pins = PINB;
     equeue[eqhead].type = EV_PINCHANGE;
-    equeue[eqhead].data = pins;
+    equeue[eqhead].data = PINB;
     if (++eqhead == EVQUEUESIZE) eqhead = 0;
 }
 
