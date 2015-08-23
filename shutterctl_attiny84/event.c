@@ -1,6 +1,5 @@
 #include "event.h"
 
-#include <string.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
@@ -155,7 +154,13 @@ void event_loop(void)
 	}
 
 	/* sleep if no more events are pending and no timer tick enabled */
-	if (!ticksEnabled) __asm__ volatile("sleep");
+	cli();
+	if (eqtail == eqhead && !ticksEnabled)
+	{
+	    sei();
+	    __asm__ volatile("sleep");
+	}
+	else sei();
     }
     UNREACHABLE();
 }
