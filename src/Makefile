@@ -14,7 +14,8 @@ SIMAVRINCLUDES:= /usr/local/include/simavr
 INCLUDES+= -I$(QTINCLUDES) $(addprefix -I$(QTINCLUDES)/,$(QTMODULES))
 INCLUDES+= -I$(SIMAVRINCLUDES)
 
-LIBS+= -pthread $(addprefix -l,$(QTMODULES)) -lsimavr
+LIBS+= -pthread $(addprefix -l,$(QTMODULES)) \
+       -Wl,--Bstatic -lsimavr -lelf -Wl,--Bdynamic
 
 LDFLAGS+= -L$(QTLIBS) -L$(SIMAVRLIBS)
 
