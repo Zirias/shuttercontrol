@@ -1,20 +1,15 @@
-TARGETS:= shuttercontrol shutterctl_attiny84/shutterctl.afx
+MOC?= moc-qt4
+QTLIBS?= /usr/local/lib/qt4
+QTINCLUDES?= /usr/local/include/qt4
+GNUMAKE?= gmake
 
-all: $(TARGETS)
+MAKEFLAGS+= MOC=${MOC} QTLIBS=${QTLIBS} QTINCLUDES=${QTINCLUDES}
 
-shuttercontrol:
-	$(MAKE) -Csrc
+all:
+	${GNUMAKE} ${MAKEFLAGS} $@
 
-shutterctl_attiny84/shutterctl.afx:
-	$(MAKE) -Cshutterctl_attiny84
+.DEFAULT:
+	${GNUMAKE} ${MAKEFLAGS} $@
 
-clean:
-	$(MAKE) -Csrc clean
-	$(MAKE) -Cshutterctl_attiny84 clean
-
-distclean:
-	$(MAKE) -Csrc distclean
-	$(MAKE) -Cshutterctl_attiny84 distclean
-
-.PHONY: all clean distclean $(TARGETS)
+.PHONY: all
 

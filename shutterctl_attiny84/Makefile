@@ -35,7 +35,7 @@ $(TARGET): $(OBJS)
 	$(VCCLD)
 	$(VR)$(CC) -o$@ $(CFLAGS) $(LDFLAGS) $^
 ifneq ($(AVRSIZE),)
-	$(VR)$(AVRSIZE) -C --mcu=$(AVRDEV) $(TARGET)
+	-$(VR)$(AVRSIZE) -C --mcu=$(AVRDEV) $(TARGET)
 endif
 
 %.d: %.c Makefile
