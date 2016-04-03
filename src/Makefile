@@ -1,15 +1,15 @@
-CXX:= g++
-MOC:= moc
+CXX?= g++
+MOC?= moc
 
 TARGET:= ../shuttercontrol
 
-QTLIBS:= /usr/lib/x86_64-linux-gnu
-QTINCLUDES:= /usr/include/qt4
+QTLIBS?= /usr/lib/x86_64-linux-gnu
+QTINCLUDES?= /usr/include/qt4
 
 QTMODULES:= QtGui QtCore
 
-SIMAVRLIBS:= /usr/local/lib
-SIMAVRINCLUDES:= /usr/local/include/simavr
+SIMAVRLIBS?= /usr/local/lib
+SIMAVRINCLUDES?= /usr/local/include/simavr
 
 INCLUDES+= -I$(QTINCLUDES) $(addprefix -I$(QTINCLUDES)/,$(QTMODULES))
 INCLUDES+= -I$(SIMAVRINCLUDES)
