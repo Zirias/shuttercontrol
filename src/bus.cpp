@@ -8,7 +8,7 @@ Bus::Bus(int lines)
 
 void Bus::set(int lines, int mask)
 {
-    this->lines = (Bus::Lines)(((int)this->lines & ~mask) | lines & mask);
+    this->lines = (Bus::Lines)(((int)this->lines & ~mask) | (lines & mask));
     emit changed(this);
 }
 

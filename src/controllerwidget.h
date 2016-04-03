@@ -1,5 +1,5 @@
 #ifndef SCTL_CONTROLLERWIDGET_H
-#define SCTL_CONTRLLLERWIDGET_H
+#define SCTL_CONTROLLERWIDGET_H
 
 #include <QGroupBox>
 

@@ -1,5 +1,5 @@
 #ifndef SCTL_BUSWIDGET_H
-#define SCRL_BUSWIDGET_H
+#define SCTL_BUSWIDGET_H
 
 #include <QWidget>
 
