@@ -1,6 +1,7 @@
 #include "shutterctl.h"
 
 #include "timer.h"
+#include "eepdata.h"
 #include <avr/io.h>
 
 #define shutter_stop() do { PORTA &= ~(_BV(PA6) | _BV(PA7)); } while (0)

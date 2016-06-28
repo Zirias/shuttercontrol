@@ -6,6 +6,8 @@
 typedef struct
 {
     uint8_t id;
+    uint16_t ticks_down;
+    uint16_t ticks_up;
 } eepdata;
 
 extern eepdata eep;
