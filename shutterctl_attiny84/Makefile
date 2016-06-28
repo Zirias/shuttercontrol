@@ -1,14 +1,20 @@
 AVRDEV:= attiny84
 
 CC:= avr-gcc
-AVRSIZE:= avr-size
+SIZE:= avr-size
+OBJCOPY:= avr-objcopy
 
-TARGET:= ../shutterctl.afx
-MAP:= shutterctl.map
+TGTNAME:= shutterctl
 
-DEBUG:= 1
+TARGET:= ../$(TGTNAME).afx
+MAP:= $(TGTNAME).map
 
 ADDRESS?= 1
+
+HEXDIR:= ../hex
+
+HEX:= $(HEXDIR)/$(TGTNAME).hex
+EEPROM:= $(HEXDIR)/eeprom-$(ADDRESS).hex
 
 CFLAGS:= -std=gnu99 -Wall -Os -g0 -mmcu=$(AVRDEV) -DF_CPU=8000000 \
     -DADDRESS=$(ADDRESS) -ffreestanding \
@@ -20,9 +26,12 @@ INCLUDES:= -I/usr/lib/avr/include -I/usr/local/include/simavr
 
 OBJS:= init.o main.o eepdata.o event.o timer.o shutterctl.o buttons.o bus.o
 
-ifeq ($(DEBUG),1)
+ifdef DEBUG
 CFLAGS+= -DDEBUG
 OBJS+= debug.o
+OBJDIR:= obj/debug
+else
+OBJDIR:= obj/release
 endif
 
 include ../mk/silent.mk
@@ -31,35 +40,59 @@ all: $(TARGET)
 
 $(MAP): $(TARGET)
 
-$(TARGET): $(OBJS)
+$(TARGET): $(addprefix $(OBJDIR)/,$(OBJS))
 	$(VCCLD)
 	$(VR)$(CC) -o$@ $(CFLAGS) $(LDFLAGS) $^
-ifneq ($(AVRSIZE),)
-	-$(VR)$(AVRSIZE) -C --mcu=$(AVRDEV) $(TARGET)
+ifneq ($(SIZE),)
+	-$(VR)$(SIZE) -C --mcu=$(AVRDEV) $(TARGET)
 endif
 
-%.d: %.c Makefile
+hex: $(HEX) $(EEPROM)
+
+$(HEXDIR):
+	$(VMD)
+	$(VR)mkdir -p $(HEXDIR)
+
+$(HEX): $(TARGET) | $(HEXDIR)
+	$(VGEN)
+	$(VR)$(OBJCOPY) -j .text -j .data -O ihex $< $@
+
+$(EEPROM): $(TARGET) | $(HEXDIR)
+	$(VGEN)
+	$(VR)$(OBJCOPY) -j .eeprom --change-section-lma .eeprom=0 -O ihex $< $@
+
+$(OBJDIR):
+	$(VMD)
+	$(VR)mkdir -p $(OBJDIR)
+
+$(OBJDIR)/%.d: %.S Makefile | $(OBJDIR)
+	$(VDEP)
+	$(VR)$(CC) -MM -MT"$@ $(@:.d=.o)" -MF$@ $(CFLAGS) $(INCLUDES) $<
+
+$(OBJDIR)/%.d: %.c Makefile | $(OBJDIR)
 	$(VDEP)
 	$(VR)$(CC) -MM -MT"$@ $(@:.d=.o)" -MF$@ $(CFLAGS) $(INCLUDES) $<
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
--include $(OBJS:.o=.d)
+-include $(addprefix $(OBJDIR)/,$(OBJS:.o=.d))
 endif
 endif
 
-%.o: %.S Makefile
+$(OBJDIR)/%.o: %.S Makefile | $(OBJDIR)
 	$(VCC)
 	$(VR)$(CC) -c -o$@ $(CFLAGS) $(INCLUDES) $<
 
-%.o: %.c Makefile
+$(OBJDIR)/%.o: %.c Makefile | $(OBJDIR)
 	$(VCC)
 	$(VR)$(CC) -c -o$@ $(CFLAGS) $(INCLUDES) $<
 
 clean:
-	rm -f $(OBJS)
+	rm -fr $(OBJDIR)
 
 distclean: clean
+	rm -fr $(HEXDIR)
+	rm -fr obj
 	rm -f $(TARGET) $(MAP)
 
 .PHONY: all clean distclean

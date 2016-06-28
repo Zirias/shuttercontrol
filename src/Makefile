@@ -61,7 +61,8 @@ $(TARGET): $(addprefix $(OBJDIR)/,$(ALLOBJS))
 	$(VR)$(CROSS)$(CXX) -o$@ $(CXXFLAGS) $(LDFLAGS) $^ $(LIBS)
 
 $(OBJDIR):
-	@mkdir -p $(OBJDIR)
+	$(VMD)
+	$(VR)mkdir -p $(OBJDIR)
 
 $(OBJDIR)/%.d: %.cpp Makefile | $(OBJDIR)
 	$(VDEP)
