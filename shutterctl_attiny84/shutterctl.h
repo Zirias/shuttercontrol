@@ -3,15 +3,12 @@
 
 #include "common.h"
 
-#define INVALID_POS 0xff
-#define MAXTICKS 4000
-
 typedef enum shutterctl_prio
 {
     PRIO_NONE = 0,
     PRIO_BUS,
-    PRIO_CAL,
-    PRIO_MANUAL
+    PRIO_MANUAL,
+    PRIO_CAL
 } shutterctl_prio;
 
 void shutterctl_init(void);

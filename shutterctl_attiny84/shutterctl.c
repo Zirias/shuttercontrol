@@ -14,6 +14,7 @@ static uint8_t pos = 63;
 #define STOPPED	    0x00
 #define UP	    0x10
 #define DOWN	    0x20
+#define CALWAIT	    0x40
 #define AUTOSTOP    0x80
 
 #define CAL_MAXTICKS 4000
@@ -23,7 +24,9 @@ typedef enum shutterctl_calstate
     CAL_NONE = 0,
     CAL_READY,
     CAL_INIT,
+    CAL_WAITDOWN,
     CAL_DOWN,
+    CAL_WAITUP,
     CAL_UP
 } shutterctl_calstate;
 
@@ -35,6 +38,11 @@ static void shutterTimeout(const event *ev, void *data)
 {
     if (calstate)
     {
+	if (state & CALWAIT)
+	{
+	    shutterctl_calibrate();
+	    return;
+	}
 	state = 0;
 	calstate = CAL_NONE;
     }
@@ -65,7 +73,7 @@ static uint16_t stopAndReadTimer(void)
     shutter_stop();
     uint16_t ticks = timer_ticks(shutterTimer);
     timer_stop(shutterTimer);
-    return ticks ? initticks - ticks : MAXTICKS;
+    return ticks ? initticks - ticks : 0;
 }
 
 void shutterctl_stop(shutterctl_prio prio)
@@ -149,6 +157,11 @@ void shutterctl_calibrate(void)
 	    case CAL_INIT:
 		timer_stop(shutterTimer);
 		shutter_stop();
+		state = prio | CALWAIT;
+		timer_start(shutterTimer, 100);
+		calstate = CAL_WAITDOWN;
+		break;
+	    case CAL_WAITDOWN:
 		shutter_down();
 		state = prio | DOWN | AUTOSTOP;
 		initticks = CAL_MAXTICKS;
@@ -157,6 +170,11 @@ void shutterctl_calibrate(void)
 		break;
 	    case CAL_DOWN:
 		down_ticks = stopAndReadTimer();
+		state = prio | CALWAIT;
+		timer_start(shutterTimer, 100);
+		calstate = CAL_WAITUP;
+		break;
+	    case CAL_WAITUP:
 		shutter_up();
 		state = prio | UP | AUTOSTOP;
 		initticks = CAL_MAXTICKS;
