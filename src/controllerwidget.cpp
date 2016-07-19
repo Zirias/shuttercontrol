@@ -56,10 +56,12 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     upButton = new QPushButton(tr("up"), this);
     stopButton = new QPushButton(tr("stop"), this);
     downButton = new QPushButton(tr("down"), this);
+    calButton = new QPushButton(tr("calibrate"), this);
 
     vbox->addWidget(upButton);
     vbox->addWidget(stopButton);
     vbox->addWidget(downButton);
+    vbox->addWidget(calButton);
     vbox->addWidget(connector);
 
     setLayout(vbox);
@@ -67,6 +69,7 @@ ControllerWidget::ControllerWidget(QWidget *connector, QWidget *parent)
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(stopButton, SIGNAL(clicked()), this, SLOT(stopClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
+    connect(calButton, SIGNAL(clicked()), this, SLOT(calClicked()));
     connect(clockSelect, SIGNAL(currentIndexChanged(int)),
 	    this, SLOT(clockSelected(int)));
     connect(addrSelect, SIGNAL(currentIndexChanged(int)),
@@ -86,6 +89,11 @@ void ControllerWidget::stopClicked()
 void ControllerWidget::downClicked()
 {
     emit down();
+}
+
+void ControllerWidget::calClicked()
+{
+    emit cal();
 }
 
 void ControllerWidget::clockSelected(int index)

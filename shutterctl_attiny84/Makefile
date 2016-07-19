@@ -11,13 +11,15 @@ MAP:= $(TGTNAME).map
 
 ADDRESS?= 1
 
+VERSION= 3
+
 HEXDIR:= ../hex
 
 HEX:= $(HEXDIR)/$(TGTNAME).hex
 EEPROM:= $(HEXDIR)/eeprom-$(ADDRESS).hex
 
 CFLAGS:= -std=gnu99 -Wall -Os -g0 -mmcu=$(AVRDEV) -DF_CPU=8000000 \
-    -DADDRESS=$(ADDRESS) -ffreestanding \
+    -DVERSION=$(VERSION) -DADDRESS=$(ADDRESS) -ffreestanding \
     -fno-inline-small-functions -ffunction-sections -fdata-sections \
     -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 LDFLAGS:= -Wl,--relax,--gc-sections,-s \

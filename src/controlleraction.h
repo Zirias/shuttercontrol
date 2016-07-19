@@ -36,7 +36,8 @@ class ControllerAction
 	    Up,
 	    Down,
 	    Stop,
-	    Status
+	    Status,
+	    Cal
 	};
 
 	const Step &nextStep();

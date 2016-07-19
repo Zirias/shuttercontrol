@@ -1,7 +1,7 @@
 #include "eepdata.h"
 #include <avr/eeprom.h>
 
-static eepdata eepro EEMEM = { 0x20 | ADDRESS , 4000, 4000 };
+static eepdata eepro EEMEM = { (VERSION<<5) | ADDRESS , 3000, 3000 };
 eepdata eep;
 
 void eepdata_init(void)

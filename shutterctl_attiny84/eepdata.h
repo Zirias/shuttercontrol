@@ -16,5 +16,6 @@ extern eepdata eep;
 #define eep_address (eep.id & 0x1f)
 
 void eepdata_init(void);
+void eepdata_save(void);
 
 #endif

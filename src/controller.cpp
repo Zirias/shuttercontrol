@@ -44,6 +44,11 @@ void Controller::stop()
     startAction(new ControllerAction(ControllerAction::Stop, addr));
 }
 
+void Controller::cal()
+{
+    startAction(new ControllerAction(ControllerAction::Cal, addr));
+}
+
 void Controller::setClock(const BusClock *clock)
 {
     this->clock = clock;

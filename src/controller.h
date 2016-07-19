@@ -22,6 +22,7 @@ class Controller: public BusClient
 	void up();
 	void down();
 	void stop();
+	void cal();
 	void setClock(const BusClock *clock);
 	void setAddr(int addr);
 

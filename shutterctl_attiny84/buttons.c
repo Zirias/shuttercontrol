@@ -32,12 +32,39 @@ static void pinChanged(const event *ev, void *data)
 {
     uint8_t ticks = timer_ticks(buttonTimer);
 
+    if (shutterctl_calibrating())
+    {
+	BOOL edge = 0;
+	if ((ev->data & UP_PIN) && !(state & UP_PIN))
+	{
+	    state |= UP_PIN;
+	}
+	else if ((ev->data & DOWN_PIN) && !(state & DOWN_PIN))
+	{
+	    state |= DOWN_PIN;
+	}
+	else if (!(ev->data & UP_PIN) && (state & UP_PIN))
+	{
+	    state &= ~UP_PIN;
+	    edge = 1;
+	}
+	else if (!(ev->data & DOWN_PIN) && (state & DOWN_PIN))
+	{
+	    state &= ~DOWN_PIN;
+	    edge = 1;
+	}
+	if (ticks || !edge) return;
+	timer_start(buttonTimer, 12);
+	shutterctl_calibrate();
+	return;
+    }
+
     if ((ev->data & UP_PIN) && !(state & UP_PIN))
     {
 	state |= UP_PIN;
 	if (ticks)
 	{
-	    if (ticks < 23) /* minimum 8 ticks lo */
+	    if (ticks < 19) /* minimum 12 ticks lo */
 	    {
 		timer_stop(buttonTimer);
 		shutterctl_up(PRIO_MANUAL, TRUE);
@@ -53,7 +80,7 @@ static void pinChanged(const event *ev, void *data)
 	state |= DOWN_PIN;
 	if (ticks)
 	{
-	    if (ticks < 23) /* minimum 8 ticks lo */
+	    if (ticks < 19) /* minimum 12 ticks lo */
 	    {
 		timer_stop(buttonTimer);
 		shutterctl_down(PRIO_MANUAL, TRUE);

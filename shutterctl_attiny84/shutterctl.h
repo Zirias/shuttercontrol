@@ -22,6 +22,7 @@ void shutterctl_down(shutterctl_prio prio, BOOL autostop);
 void shutterctl_calibrate(void);
 
 BOOL shutterctl_isactive(void);
+BOOL shutterctl_calibrating(void);
 uint8_t shutterctl_pos(void);
 
 #endif

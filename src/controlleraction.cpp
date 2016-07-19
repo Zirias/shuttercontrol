@@ -22,6 +22,7 @@ static const int cmd_status = 0x20;
 static const int cmd_up = 0x21;
 static const int cmd_down = 0x22;
 static const int cmd_stop = 0x23;
+static const int cmd_cal = 0x24;
 
 ControllerAction::ControllerAction(ControllerAction::Type type, int address)
     : _pos(-1), _address(address)
@@ -64,6 +65,15 @@ ControllerAction::ControllerAction(ControllerAction::Type type, int address)
 	    _steps.append(Step(Step::Write, 0x80 | cmd_status));
 	    _steps.append(Step(Step::WaitClock));
 	    _steps.append(Step(Step::Write, 0xc0 | cmd_status));
+	    break;
+	case ControllerAction::Cal:
+	    _steps.append(Step(Step::Write, 0x80 | address));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0xc0 | address));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0x80 | cmd_cal));
+	    _steps.append(Step(Step::WaitClock));
+	    _steps.append(Step(Step::Write, 0xc0 | cmd_cal));
 	    break;
     }
     _steps.append(Step(Step::WaitClock));

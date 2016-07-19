@@ -18,6 +18,7 @@ class ControllerWidget: public QGroupBox
 	void upClicked();
 	void downClicked();
 	void stopClicked();
+	void calClicked();
 	void clockSelected(int index);
 	void addrSelected(int index);
 
@@ -25,6 +26,7 @@ class ControllerWidget: public QGroupBox
 	void up();
 	void down();
 	void stop();
+	void cal();
 	void selectClock(const BusClock *clock);
 	void selectAddr(int addr);
 
@@ -32,6 +34,7 @@ class ControllerWidget: public QGroupBox
 	QPushButton *upButton;
 	QPushButton *downButton;
 	QPushButton *stopButton;
+	QPushButton *calButton;
 	QComboBox *clockSelect;
 	QComboBox *addrSelect;
 };
