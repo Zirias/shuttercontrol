@@ -11,6 +11,7 @@
 #define CMD_UP	    0x01
 #define CMD_DOWN    0x02
 #define CMD_STOP    0x03
+#define CMD_CAL	    0x04
 
 static uint8_t status = 0;
 
@@ -46,6 +47,10 @@ static void pinChanged(const event *ev, void *data)
 		case CMD_STATUS:
 		    status = ATN | CMD_STATUS;
 		    return;
+		case CMD_CAL:
+		    shutterctl_calibrate();
+		    status = 0;
+		    return;
 		default:
 		    PORTA |= _BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4);
 		    DDRA &= ~(_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4));
@@ -60,9 +65,7 @@ static void pinChanged(const event *ev, void *data)
 		case CMD_STATUS:
 		    DDRA |= _BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4);
 		    PORTA &= ~(_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4));
-		    uint8_t pos = shutterctl_pos();
-		    if (!pos) PORTA |= _BV(PA0);
-		    else if (pos == shutterctl_maxpos()) PORTA |= _BV(PA1);
+		    PORTA |= shutterctl_pos();
 		    return;
 	    }
 	}
