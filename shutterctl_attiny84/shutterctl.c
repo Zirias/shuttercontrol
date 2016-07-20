@@ -9,6 +9,7 @@
 #define shutter_down() do { PORTA |= _BV(PA7); } while (0)
 
 static timer shutterTimer;
+static timer delayTimer;
 static uint8_t pos = 63;
 
 #define STOPPED	    0x00
@@ -31,8 +32,30 @@ typedef enum shutterctl_calstate
 } shutterctl_calstate;
 
 static uint8_t state = 0;
+static uint8_t oldstate = 0;
+static uint8_t newstate = 0;
 static uint16_t initticks = 0;
 static shutterctl_calstate calstate = CAL_NONE;
+
+static void start(void)
+{
+    if (newstate & UP)
+    {
+	initticks = ((uint16_t)(63 - pos) << 4) / 63
+	    * eep.ticks_up / 16 + 150;
+	shutter_up();
+    }
+    else if (newstate & DOWN)
+    {
+	initticks = ((uint16_t)pos << 4 ) / 63
+	    * eep.ticks_down / 16 + 150;
+	shutter_down();
+    }
+    else return;
+    state = newstate;
+    newstate = 0;
+    timer_start(shutterTimer, initticks);
+}
 
 static void shutterTimeout(const event *ev, void *data)
 {
@@ -61,9 +84,16 @@ static void shutterTimeout(const event *ev, void *data)
     }
 }
 
+static void delayTimeout(const event *ev, void *data)
+{
+    oldstate = 0;
+    start();
+}
+
 void shutterctl_init(void)
 {
     shutterTimer = timer_create(shutterTimeout, 0);
+    delayTimer = timer_create(delayTimeout, 0);
     shutterctl_down(PRIO_MANUAL, 1);
 }
 
@@ -103,6 +133,8 @@ void shutterctl_stop(shutterctl_prio prio)
 		}
 	    }
 	}
+	if (state && !oldstate) oldstate = state;
+	timer_start(delayTimer, 100);
 	state = 0;
     }
 }
@@ -112,11 +144,14 @@ void shutterctl_up(shutterctl_prio prio, BOOL autostop)
     if (prio >= (state & 0xf))
     {
 	shutterctl_stop(prio);
-	initticks = ((uint16_t)(63 - pos) << 4) / 63 * eep.ticks_up / 16 + 150;
-	shutter_up();
-	state = prio | UP;
-	if (autostop) state |= AUTOSTOP;
-	timer_start(shutterTimer, initticks);
+	newstate = prio | UP;
+	if (autostop) newstate |= AUTOSTOP;
+	if (!(oldstate & DOWN))
+	{
+	    timer_stop(delayTimer);
+	    oldstate = 0;
+	    start();
+	}
     }
 }
 
@@ -125,11 +160,14 @@ void shutterctl_down(shutterctl_prio prio, BOOL autostop)
     if (prio >= (state & 0xf))
     {
 	shutterctl_stop(prio);
-	initticks = ((uint16_t)pos << 4 ) / 63 * eep.ticks_down / 16 + 150;
-	shutter_down();
-	state = prio | DOWN;
-	if (autostop) state |= AUTOSTOP;
-	timer_start(shutterTimer, initticks);
+	newstate = prio | DOWN;
+	if (autostop) newstate |= AUTOSTOP;
+	if (!(oldstate & UP))
+	{
+	    timer_stop(delayTimer);
+	    oldstate = 0;
+	    start();
+	}
     }
 }
 
