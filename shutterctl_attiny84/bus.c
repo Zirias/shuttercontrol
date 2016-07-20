@@ -13,6 +13,13 @@
 #define CMD_STOP    0x03
 #define CMD_CAL	    0x04
 
+#define input() do { \
+    PORTA |= _BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4); \
+    DDRA &= ~(_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4)); } while (0)
+#define output() do { \
+    DDRA |= _BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4); \
+    PORTA &= ~(_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4)); } while (0)
+
 static uint8_t status = 0;
 
 static void pinChanged(const event *ev, void *data)
@@ -52,8 +59,6 @@ static void pinChanged(const event *ev, void *data)
 		    status = 0;
 		    return;
 		default:
-		    PORTA |= _BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4);
-		    DDRA &= ~(_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4));
 		    status = 0;
 		    return;
 	    }
@@ -63,8 +68,7 @@ static void pinChanged(const event *ev, void *data)
 	    switch (status & DATAMASK)
 	    {
 		case CMD_STATUS:
-		    DDRA |= _BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4);
-		    PORTA &= ~(_BV(PA0)|_BV(PA1)|_BV(PA2)|_BV(PA3)|_BV(PA4));
+		    output();
 		    PORTA |= shutterctl_pos();
 		    return;
 	    }
@@ -81,7 +85,11 @@ static BOOL pinChangedFilter(const event *ev, ev_handler handler, void *data)
 {
     static uint8_t pin = 1;
 
-    if (!(ev->data & 0x4)) pin = 0;
+    if (!(ev->data & 0x4))
+    {
+	input();
+	pin = 0;
+    }
     else if (!pin)
     {
 	pin = 1;
