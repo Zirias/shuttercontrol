@@ -1,5 +1,9 @@
 AVRDEV:= attiny84
 
+AVRDUDE:= avrdude
+PART:= t84
+PROGRAMMER:= avrisp2
+
 CC:= avr-gcc
 SIZE:= avr-size
 OBJCOPY:= avr-objcopy
@@ -49,6 +53,10 @@ ifneq ($(SIZE),)
 	-$(VR)$(SIZE) -C --mcu=$(AVRDEV) $(TARGET)
 endif
 
+program: hex
+	$(AVRDUDE) -c $(PROGRAMMER) -p $(PART) -U flash:w:$(HEX):i
+	$(AVRDUDE) -c $(PROGRAMMER) -p $(PART) -U eeprom:w:$(EEPROM):i
+
 hex: $(HEX) $(EEPROM)
 
 $(HEXDIR):
@@ -97,5 +105,5 @@ distclean: clean
 	rm -fr obj
 	rm -f $(TARGET) $(MAP)
 
-.PHONY: all clean distclean
+.PHONY: all hex program clean distclean
 
