@@ -141,6 +141,12 @@ void shutterctl_stop(shutterctl_prio prio)
 
 void shutterctl_up(shutterctl_prio prio, BOOL autostop)
 {
+    if ((state & ~AUTOSTOP) == (prio | UP))
+    {
+	state = prio | UP;
+	if (autostop) state |= AUTOSTOP;
+	return;
+    }
     if (prio >= (state & 0xf))
     {
 	shutterctl_stop(prio);
@@ -157,6 +163,12 @@ void shutterctl_up(shutterctl_prio prio, BOOL autostop)
 
 void shutterctl_down(shutterctl_prio prio, BOOL autostop)
 {
+    if ((state & ~AUTOSTOP) == (prio | DOWN))
+    {
+	state = prio | DOWN;
+	if (autostop) state |= AUTOSTOP;
+	return;
+    }
     if (prio >= (state & 0xf))
     {
 	shutterctl_stop(prio);
