@@ -15,7 +15,7 @@ MAP:= $(TGTNAME).map
 
 ADDRESS?= 1
 
-VERSION= 3
+VERSION= 4
 
 HEXDIR:= ../hex
 
@@ -44,6 +44,21 @@ include ../mk/silent.mk
 
 all: $(TARGET)
 
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),distclean)
+eepcfg.mk:
+	$(VGENT)
+	$(VR)echo $(EQT)C_VERSION := $(VERSION)$(EQT) >eepcfg.mk
+	$(VR)echo $(EQT)C_ADDRESS := $(ADDRESS)$(EQT) >>eepcfg.mk
+
+-include eepcfg.mk
+
+ifneq ($(strip $(C_VERSION))_$(strip $(C_ADDRESS)),$(strip $(VERSION))_$(strip $(ADDRESS)))
+.PHONY: eepcfg.mk
+endif
+endif
+endif
+
 $(MAP): $(TARGET)
 
 $(TARGET): $(addprefix $(OBJDIR)/,$(OBJS))
@@ -53,8 +68,12 @@ ifneq ($(SIZE),)
 	-$(VR)$(SIZE) -C --mcu=$(AVRDEV) $(TARGET)
 endif
 
-program: hex
+program: prgflash prgeep
+
+prgflash: $(HEX)
 	$(AVRDUDE) -c $(PROGRAMMER) -p $(PART) -U flash:w:$(HEX):i
+
+prgeep: $(EEPROM)
 	$(AVRDUDE) -c $(PROGRAMMER) -p $(PART) -U eeprom:w:$(EEPROM):i
 
 hex: $(HEX) $(EEPROM)
@@ -97,6 +116,8 @@ $(OBJDIR)/%.o: %.c Makefile | $(OBJDIR)
 	$(VCC)
 	$(VR)$(CC) -c -o$@ $(CFLAGS) $(INCLUDES) $<
 
+$(OBJDIR)/eepdata.o: eepcfg.mk
+
 clean:
 	rm -fr $(OBJDIR)
 
@@ -105,5 +126,5 @@ distclean: clean
 	rm -fr obj
 	rm -f $(TARGET) $(MAP)
 
-.PHONY: all hex program clean distclean
+.PHONY: all hex program prgflash prgeep clean distclean
 

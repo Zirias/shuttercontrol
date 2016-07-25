@@ -4,8 +4,6 @@
 #include "timer.h"
 #include "shutterctl.h"
 
-static timer buttonTimer;
-
 #define UP_PIN	    0x01
 #define DOWN_PIN    0x02
 #define MANUAL	    0x08
@@ -20,6 +18,8 @@ static timer buttonTimer;
 #define MANUAL_TICKS	(30 - DEBOUNCE_TICKS)
 
 static uint8_t state = PINMASK;
+
+static timer buttonTimer;
 
 static void buttonTimeout(const event *ev, void *data)
 {
